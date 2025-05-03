@@ -12,7 +12,7 @@ dependencies = [
     "cffi==1.17.0",
     "charset-normalizer==3.3.2",
     "cryptography==43.0.0",
-    "django==5.1",
+    "django==5.1.8",
     "django-cors-headers==4.4.0",
     "djangorestframework==3.15.2",
     "djangorestframework-simplejwt==5.3.1",

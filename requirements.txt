@@ -18,7 +18,7 @@ charset-normalizer==3.3.2
     # via requests
 cryptography==43.0.0
     # via pyjwt
-django==5.1
+django==5.1.8
     # via
     #   -r requirements.in
     #   djangorestframework
