@@ -1,8 +1,10 @@
 [project]
 name = "saphira"
-version = "0.1.0"
+version = "1.0.0"
 description = "API de gerenciamento de serviços da Semana de SI"
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.12"
 dependencies = [
     "asgiref==3.8.1",
@@ -47,3 +49,14 @@ dependencies = [
     "uritemplate==4.1.1",
     "urllib3==2.2.2",
 ]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.8",
+    "taskipy>=1.14.1",
+]
+
+[tool.taskipy.tasks]
+manage = "uv run src/manage.py"
+lint = "ruff check"
+format = "ruff format"
