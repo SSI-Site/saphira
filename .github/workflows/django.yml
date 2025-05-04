@@ -29,5 +29,9 @@ jobs:
       run: |
         echo '${{ vars.FIREBASE_SECRETS }}' > firebase-key.json
     - name: Run Tests
+      env:
+        SAPHIRA_ENV: ${{ vars.SAPHIRA_ENV }}
+        SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
+        SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
       run: |
        uv run src/manage.py test src/testes
