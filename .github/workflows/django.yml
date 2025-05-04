@@ -27,9 +27,9 @@ jobs:
         uv sync
     - name: Run Tests
       env:
-        SAPHIRA_ENV: ${{ env.SAPHIRA_ENV }}
+        SAPHIRA_ENV: ${{ vars.SAPHIRA_ENV }}
         SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
-        SAPHIRA_ALLOWED_HOSTS: ${{ env.SAPHIRA_ALLOWED_HOSTS }}
+        SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
         FIREBASE_TYPE: ${{ secrets.FIREBASE_TYPE }}
         FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         FIREBASE_PRIVATE_KEY_ID: ${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
