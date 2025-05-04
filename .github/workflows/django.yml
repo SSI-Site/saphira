@@ -14,7 +14,6 @@ jobs:
       max-parallel: 4
       matrix:
         python-version: [3.9, 3.11, 3.12]
-    environment: env
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
@@ -28,9 +27,9 @@ jobs:
         uv sync
     - name: Run Tests
       env:
-        SAPHIRA_ENV: DEV
+        SAPHIRA_ENV: ${{ env.SAPHIRA_ENV }}
         SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
-        SAPHIRA_ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0
+        SAPHIRA_ALLOWED_HOSTS: ${{ env.SAPHIRA_ALLOWED_HOSTS }}
         FIREBASE_TYPE: ${{ secrets.FIREBASE_TYPE }}
         FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
         FIREBASE_PRIVATE_KEY_ID: ${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
