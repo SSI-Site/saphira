@@ -27,7 +27,7 @@ jobs:
         uv sync
     - name: Add secrets.json
       run: |
-        echo '${{ vars.FIREBASE_SECRETS }}' > firebase-key.json
+        echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
     - name: Run Tests
       env:
         SAPHIRA_ENV: ${{ vars.SAPHIRA_ENV }}
