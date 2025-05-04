@@ -21,6 +21,7 @@ else:
         "client_x509_cert_url": os.getenv("FIREBASE_CLIENT_X509_CERT_URL"),
         "universe_domain": os.getenv("FIREBASE_UNIVERSE_DOMAIN", "googleapis.com")
     }
+    print(firebase_creds)
     cred = credentials.Certificate(firebase_creds)
 
 firebase_admin.initialize_app(cred)
