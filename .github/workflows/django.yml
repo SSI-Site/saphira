@@ -27,7 +27,7 @@ jobs:
         uv sync
     - name: Add secrets.json
       run: |
-        echo "${{ vars.FIREBASE_SECRETS }}" >> firebase-key.json
+        echo '${{ vars.FIREBASE_SECRETS }}' > firebase-key.json
     - name: Run Tests
       run: |
        uv run src/manage.py test src/testes
