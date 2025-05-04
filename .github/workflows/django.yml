@@ -25,24 +25,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install uv
         uv sync
-    - name: Run Tests
-      env:
-        SAPHIRA_ENV: ${{ vars.SAPHIRA_ENV }}
-        SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
-        SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
-        FIREBASE_TYPE: ${{ secrets.FIREBASE_TYPE }}
-        FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
-        FIREBASE_PRIVATE_KEY_ID: ${{ secrets.FIREBASE_PRIVATE_KEY_ID }}
-        FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
-        FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
-        FIREBASE_CLIENT_ID: ${{ secrets.FIREBASE_CLIENT_ID }}
-        FIREBASE_AUTH_URI: ${{ secrets.FIREBASE_AUTH_URI }}
-        FIREBASE_TOKEN_URI: ${{ secrets.FIREBASE_TOKEN_URI }}
-        FIREBASE_AUTH_PROVIDER_X509_CERT_URL: ${{ secrets.FIREBASE_AUTH_PROVIDER_X509_CERT_URL }}
-        FIREBASE_CLIENT_X509_CERT_URL: ${{ secrets.FIREBASE_CLIENT_X509_CERT_URL }}
-        FIREBASE_UNIVERSE_DOMAIN: ${{ secrets.FIREBASE_UNIVERSE_DOMAIN }}
+    - name: Add secrets.json
       run: |
-        echo "FIREBASE_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
-        echo "${{ vars.FIREBASE_PRIVATE_KEY }}" | sed 's/\\n/\n/g' >> $GITHUB_ENV
-        echo "EOF" >> $GITHUB_ENV
-        uv run src/manage.py test src/testes
+        echo "${{ vars.FIREBASE_SECRETS }}" >> firebase-key.json
+    - name: Run Tests
+      run: |
+       uv run src/manage.py test src/testes
