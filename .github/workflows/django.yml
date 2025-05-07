@@ -32,4 +32,4 @@ jobs:
         SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
         SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
       run: |
-       uv run src/manage.py test src/testes
+       uv run src/manage.py test tests
