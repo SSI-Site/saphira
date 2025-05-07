@@ -52,6 +52,7 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "djangorestframework-stubs>=3.16.0",
     "ruff>=0.11.8",
     "taskipy>=1.14.1",
 ]
