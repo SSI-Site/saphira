@@ -146,7 +146,7 @@ class StudentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             student = Student.objects.get(id=student_id)
         except Student.DoesNotExist:
             return Response({'error': 'Student not found'}, status=404)
-        
+
         allowed_fields = ['usp_number']
 
         for field in allowed_fields:
@@ -255,8 +255,8 @@ class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
         student_document = self.kwargs.get('student_document')
 
         student = Student.objects.filter(
-            models.Q(email=student_document) | 
-            models.Q(code=student_document.upper()) | 
+            models.Q(email=student_document) |
+            models.Q(code=student_document.upper()) |
             models.Q(usp_number=student_document)
         ).first()
 
@@ -292,8 +292,8 @@ class AdminDestroyStudentView(generics.DestroyAPIView):
         lookup_value = self.kwargs.get(self.lookup_field)
 
         student = self.queryset.filter(
-            models.Q(email=lookup_value) | 
-            models.Q(code=lookup_value) | 
+            models.Q(email=lookup_value) |
+            models.Q(code=lookup_value) |
             models.Q(usp_number=lookup_value)
         ).first()
 
@@ -357,7 +357,7 @@ class AdminListCreatePresenceView(generics.ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        
+
         if serializer.is_valid():
             presence = serializer.save()
             return Response(self.get_serializer(presence).data, status=status.HTTP_201_CREATED)
@@ -373,24 +373,24 @@ class AdminDestroyPresenceView(generics.DestroyAPIView):
         talk_id = self.kwargs.get('talk_id')
 
         student = Student.objects.filter(
-            models.Q(email=student_document) | 
-            models.Q(code=student_document.upper()) | 
+            models.Q(email=student_document) |
+            models.Q(code=student_document.upper()) |
             models.Q(usp_number=student_document)
         ).first()
 
         if not student:
             raise Http404(f"Estudante com documento {student_document} não encontrado.")
-        
+
         if not Talk.objects.filter(id=talk_id).exists():
             raise Http404(f"Palestra com id {talk_id} não encontrada.")
-        
+
         presence = Presence.objects.filter(student=student, talk_id=talk_id).first()
 
         if not presence:
             raise Http404('Presença não registrada para o estudante nesta palestra.')
 
         return presence, None
-    
+
     def delete(self, request, *args, **kwargs):
         presence, error = self.get_object()
 
@@ -406,15 +406,15 @@ class AdminInPersonDrawOnTalkView(generics.RetrieveAPIView):
         talk_id = self.kwargs.get('talk_id')
 
         talk = Talk.objects.filter(id=talk_id).first()
-        
+
         if not talk:
             return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         in_person_presences = Presence.objects.filter(talk=talk_id, online=False)
 
         if not in_person_presences.exists():
             return Response({'error': 'Nenhum estudante está presente em sala.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         random_presence = in_person_presences.order_by('?').first()
         student = random_presence.student
 
@@ -438,6 +438,7 @@ class AdminDrawOnTalkView(generics.RetrieveAPIView):
             return Response({'error': 'Nenhum estudante presente nesta palestra.'}, status=status.HTTP_400_BAD_REQUEST)
 
         random_presence = presences.order_by('?').first()
+        assert random_presence
         student = random_presence.student
 
         return Response({
