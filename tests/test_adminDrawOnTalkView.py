@@ -28,7 +28,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
         self.assertEqual(response.data["error"], f"Palestra com id {fake_id} não encontrada.")
 
 
-    def test_valid_talk(self):
+    def test_valid_talk_no_presence(self):
         """Testa o endpoint com uma palestra valida mas sem presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
@@ -43,10 +43,8 @@ class AdminDrawOnTalkTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["error"], "Nenhum estudante presente nesta palestra.")
 
-
-    def test_get_student_from_talk(self):
-        """Testa endpoint para retornar um estudante"""
-
+    def test_valid_talk_presence(self):
+        """Testa o endpoint com uma palestra valida mas com presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
             speaker="Neymar",
@@ -62,12 +60,15 @@ class AdminDrawOnTalkTestCase(APITestCase):
         presence = Presence.objects.create(
             student=student,
             talk=talk,
-            online=False
         )
 
         self.client.force_login(user=self.admin)
         response: Response = self.client.get(self.url(talk.id), format="json")
 
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, {
+            "student_name": student.name,
+        })
 
     # Retorna a url com o talk_id
     def url(self, id: int) -> str:
