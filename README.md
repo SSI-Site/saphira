@@ -34,48 +34,37 @@ A API Saphira oferece os seguintes recursos:
 
 ## Configuração
 
+0. **Instale o uv package manager**:
+  ```bash
+    pip install uv
+    uv -V
+  ```
+
 1. **Clone o repositório**:
 
     ```bash
-    git clone https://github.com/SSI-Site/Saphira.git
-    cd saphira/src
+    git clone git@github.com:SSI-Site/saphira.git
     ```
 
-2. **Crie um ambiente virtual e ative-o**:
-
-    ```bash
-    python3 -m venv venv
-    source venv/bin/activate  # No Windows use `venv\Scripts\activate`
-    ```
-
-3. **Instale as dependências**:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4. **Configure o banco de dados**:
-- Ajuste as configurações do banco de dados em `settings.py`.
-
-5. **Configure as variáveis de ambiente**:
+2. **Configure as variáveis de ambiente**:
 - Defina as variáveis de ambiente para o Firebase e outras configurações no arquivo `.env`.
 
-6. **Aplique as migrações**:
+3. **Aplique as migrações**:
 
     ```bash
-    python3 manage.py migrate
+    uv run src/manage.py migrate
     ```
 
-7. **Crie um superusuário**:
+4. **Crie um superusuário**:
 
     ```bash
-    python3 manage.py createsuperuser
+    uv run src/manage.py createsuperuser
     ```
 
-8. **Inicie o servidor**:
+5. **Inicie o servidor**:
 
     ```bash
-    python3 manage.py runserver
+    uv run src/manage.py runserver
     ```
 
 ## Uso
@@ -248,10 +237,10 @@ Nele será criado um banco de dados PostgreSQL. E após a sua criação (nome, t
 
 Além disso, instale o pacote `psycopg2` (ou psycopg2-binary em casos de erro), pois permitirá que o Django possa se conectar ao PostgreSQL.
 ```sh
-pip install psycopg2
+uv add psycopg2
 ```
 ```sh
-pip install psycopg2-binary
+uv add psycopg2-binary
 ```
 
 Por fim, configure o Django para se conectar com o banco de dados. Por padrão, os projetos do Django utilizam o banco de dados **SQLite**, portanto, primeiramente, será necessário mudar as configuração presentes no arquivo `settings.py`, substituindo as configurações do banco SQLite pelo PostgreSQL.
@@ -269,7 +258,7 @@ DATABASES = {
 ```
 Depois disso, execute as migrações para criar os modelos no banco de dados, e verifique se o Django conseguiu se conectar corretamente a ele.
 ```bash
-python manage.py migrate
+uv run src/manage.py migrate
 ```
 
 ### EC2
@@ -302,7 +291,7 @@ Por fim, vale a pena verificar as configurações do Django presentes no EC2, es
 Rode o Saphira com o comando:
 
 ```bash
-python manage.py runserver 0.0.0.0:8000
+uv run src/manage.py runserver 0.0.0.0:8000
 ```
 
 Agora, a aplicação estará acessível na internet através do IP público da instância EC2 na porta 8000.
