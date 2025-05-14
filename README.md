@@ -224,13 +224,13 @@ A API pode ser acessada localmente em `http://localhost:8000/`. Utilize ferramen
   - **Descrição**: Remove uma presença específica.
 
 ## AWS
-Para a operação e gerenciamento do banco de dados, será utilizado o `AWS` (Amazon Web Services). AWS é uma plataforma de serviços de computação em nuvem oferecida pela Amazon, fornecendo serviços em diferentes áreas, como computação, armazenamento, redes e segurança. Para tanto, serão utilizados dois principais serviços: 
+Para a operação e gerenciamento do banco de dados, será utilizado o `AWS` (Amazon Web Services). AWS é uma plataforma de serviços de computação em nuvem oferecida pela Amazon, fornecendo serviços em diferentes áreas, como computação, armazenamento, redes e segurança. Para tanto, serão utilizados dois principais serviços:
 -  [RDS](#RDS)
 -  [EC2](#EC2)
-  
+
 ### RDS
 
-O **RDS** (Relational Database Service) permite o **gerenciamento de banco de dados relacionais**. 
+O **RDS** (Relational Database Service) permite o **gerenciamento de banco de dados relacionais**.
 
 Nele será criado um banco de dados PostgreSQL. E após a sua criação (nome, tamanho, master username, etc.), será necessário configurar o seu acesso. Para isso:
 * Guarde as informações importantes, como o endpoint e a porta do banco de dados,
@@ -238,9 +238,9 @@ Nele será criado um banco de dados PostgreSQL. E após a sua criação (nome, t
 
 > [!NOTE]
 >  Ex:
-> 
+>
 >  Na seção de regras de entrada (Inbound Rules) do grupo de segurança, adicione uma nova regra:
-> 
+>
 > - Tipo: `PostgreSQL` (ou Custom TCP Rule, se você não encontrar o tipo).
 > - Protocolo: `TCP`.
 > - Porta: `5432` (ou a porta que você configurou para o PostgreSQL).
@@ -259,9 +259,9 @@ Por fim, configure o Django para se conectar com o banco de dados. Por padrão, 
 DATABASES = {
 'default': {
     'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'nome',  # O nome do banco de dados 
-    'USER': 'admin',  # O usuário master 
-    'PASSWORD': 'senha',  # A senha 
+    'NAME': 'nome',  # O nome do banco de dados
+    'USER': 'admin',  # O usuário master
+    'PASSWORD': 'senha',  # A senha
     'HOST': 'endpoint',  # O endpoint do RDS
     'PORT': '5432',  # A porta padrão do PostgreSQL
   }
@@ -286,11 +286,11 @@ Dito isso, o primeiro passo é criar uma instância EC2 no AWS.
     - Permitir tráfego SSH e TCP nas regras de entrada.
     - Verificar se a instância EC2 pode acessar a porta do PostgreSQL (`5432`) no RDS.
 
-Com o EC2 criado, o segundo passo é se conectar a ele. Para isso, siga os passos de conexão via `SSH` fornecidos no próprio AWS 
+Com o EC2 criado, o segundo passo é se conectar a ele. Para isso, siga os passos de conexão via `SSH` fornecidos no próprio AWS
 
 Se tudo der certo, agora você estará operando no computador remoto.
 
-Então o próximo passo será configurar esse ambiente na linha de comando do servidor EC2. Como fornecido em [Configuração](#Configuração): 
+Então o próximo passo será configurar esse ambiente na linha de comando do servidor EC2. Como fornecido em [Configuração](#Configuração):
 
 - Baixe as dependências, como o python, o pip e o venv;
 - Ative o venv
@@ -312,7 +312,7 @@ Agora, a aplicação estará acessível na internet através do IP público da i
 
 O **Load Balancer** distribui o tráfego de entrada em várias instâncias do EC2 para equilibrar a demanda, garantindo uma melhor disponibilidade da aplicação. No entanto, será utilizado principalmente para testar as requisições HTTPS
 
-A criação do load balancer pode ser encontrada na própria interface do EC2. 
+A criação do load balancer pode ser encontrada na própria interface do EC2.
 
 - Em **"Create Load Balancer"**, será escolhido o **Application Load Balancer (ALB}** como o tipo de Load Balancer
 - Escolha um nome, um Scheme, algumas Subnets, e o mesmo VPC onde o EC2 e o RDS estão
@@ -326,7 +326,7 @@ A criação do load balancer pode ser encontrada na própria interface do EC2.
 - Adicione e associe o Target Group
     - Selecione as instâncias EC2 que devem receber tráfego do Load Balancer e registre-os.
     - No painel de configuração do Load Balancer, na seção de **Listeners**, adicione uma regra que encaminha todas as requisições para o Target Group em **"View/Edit rules" do HTTPS**
-    
+
 
 Agora é possível testar as requisições HTTPS. Basta obter o DNS público do Load Balancer e abrí-lo no navegador com  `https://` . Se tudo estiver configurado corretamente, a aplicação Django estará rodando via HTTPS.
 > [!NOTE]
@@ -344,25 +344,25 @@ Os testes em Django são realizados por meio da classe *TestCase*, importada do 
 - **Executar todos os testes**:
 
   ```bash
-  python3 manage.py test testes
+  uv run src/manage.py test tests
   ```
 
 - **Executar teste específico**:
   ```bash
-  python3 manage.py test testes.[nome_do_teste]
+  uv run src/manage.py test tests.[nome_do_teste]
   ```
 
 - **Estrutura do Teste**:
   - `setUP`
     - **Descrição**: Usado para inicializar objetos, criar dados de teste ou qualquer outra preparação necessária.
-  
+
   -`Assertions`
     - **Descrição**: Classe de *TesteCase* que oferece métodos usados para verificar se as saídas e estados do código são os esperados
     - **Exemplos de Assertions**:
       - `assertEqual`
       - `assertTrue`
       - `assertFalse`
-  
+
 
 ### Administrador
 
