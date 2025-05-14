@@ -56,11 +56,10 @@ class CreatePresenceSerializer(serializers.ModelSerializer):
     student_document = serializers.CharField(write_only=True)
     student = serializers.PrimaryKeyRelatedField(read_only=True)
     talk = serializers.PrimaryKeyRelatedField(queryset=Talk.objects.all())
-    online = serializers.BooleanField(required=False, default=False)
 
     class Meta:
         model = Presence
-        fields = ['student_document', 'talk', 'student', 'online']
+        fields = ['student_document', 'talk', 'student']
 
     def create(self, validated_data):
         student_document = validated_data.pop('student_document')

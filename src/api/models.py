@@ -28,7 +28,6 @@ class Presence(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     talk = models.ForeignKey(Talk, on_delete=models.CASCADE)
-    online = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('student', 'talk',)

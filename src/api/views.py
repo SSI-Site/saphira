@@ -202,7 +202,6 @@ class CreateStudentOnlinePresenceView(generics.CreateAPIView):
         return Response({
           'student': presence.student.id,
           'talk': presence.talk.id,
-          'online': presence.online,
         }, status=status.HTTP_201_CREATED)
 
 @method_decorator(student_auth_required, name='dispatch')
@@ -217,7 +216,6 @@ class RetrieveStudentPresencesView(generics.ListAPIView):
             {
               "talk_title": p.talk.title,
               "date_time": p.talk.date_time,
-              "online": p.online
             }
             for p in queryset
         ]
@@ -263,14 +261,14 @@ class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
         if not student:
             return Response({'error': f"Estudante com documento {student_document} não encontrado."}, status=status.HTTP_400_BAD_REQUEST)
 
-        in_person_presences_count = Presence.objects.filter(student=student, online=False).count()
+        in_person_presences_count = Presence.objects.filter(student=student).count()
         total_presences_count = Presence.objects.filter(student=student).count()
         presences_with_talk_title = (
             Presence.objects
             .select_related('talk')
             .filter(student=student)
             .annotate(talk_title=F('talk__title'))
-            .values('talk_title', 'online')
+            .values('talk_title')
         )
 
         return Response({
@@ -410,7 +408,7 @@ class AdminInPersonDrawOnTalkView(generics.RetrieveAPIView):
         if not talk:
             return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
 
-        in_person_presences = Presence.objects.filter(talk=talk_id, online=False)
+        in_person_presences = Presence.objects.filter(talk=talk_id)
 
         if not in_person_presences.exists():
             return Response({'error': 'Nenhum estudante está presente em sala.'}, status=status.HTTP_400_BAD_REQUEST)
