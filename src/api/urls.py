@@ -32,7 +32,6 @@ urlpatterns = [
     path('admin/tokens', AdminListCreateTokensView.as_view(), name='admin-list-create-tokens'),
     path('admin/presences', AdminListCreatePresenceView.as_view(), name='admin-list-create-presence'),
     path('admin/presence/<talk_id>/<student_document>', AdminDestroyPresenceView.as_view(), name='admin-destroy-presence'),
-    path('admin/<talk_id>/in-person-draw', AdminInPersonDrawOnTalkView.as_view(), name='admin-in-person-draw-on-talk'),
     path('admin/<talk_id>/draw', AdminDrawOnTalkView.as_view(), name='admin-draw-on-talk'),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),

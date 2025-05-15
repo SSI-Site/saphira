@@ -61,3 +61,7 @@ dev = [
 manage = "uv run src/manage.py"
 lint = "ruff check"
 format = "ruff format"
+
+[tool.pyright]
+venv = ".venv"
+venvPath = "."

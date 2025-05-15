@@ -253,8 +253,8 @@ class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
         student_document = self.kwargs.get('student_document')
 
         student = Student.objects.filter(
-          models.Q(email=student_document) | 
-          models.Q(code=student_document.upper()) | 
+          models.Q(email=student_document) |
+          models.Q(code=student_document.upper()) |
           models.Q(usp_number=student_document)
         ).first()
 
@@ -397,28 +397,6 @@ class AdminDestroyPresenceView(generics.DestroyAPIView):
 
         presence.delete()
         return Response({'message': 'Presença removida com sucesso.'}, status=status.HTTP_200_OK)
-
-@method_decorator(admin_auth_required, name='dispatch')
-class AdminInPersonDrawOnTalkView(generics.RetrieveAPIView):
-    def get(self, request, *args, **kwargs):
-        talk_id = self.kwargs.get('talk_id')
-
-        talk = Talk.objects.filter(id=talk_id).first()
-
-        if not talk:
-            return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
-
-        in_person_presences = Presence.objects.filter(talk=talk_id)
-
-        if not in_person_presences.exists():
-            return Response({'error': 'Nenhum estudante está presente em sala.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        random_presence = in_person_presences.order_by('?').first()
-        student = random_presence.student
-
-        return Response({
-            'student_name': student.name
-        })
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDrawOnTalkView(generics.RetrieveAPIView):
