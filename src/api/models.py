@@ -31,3 +31,21 @@ class Presence(models.Model):
 
     class Meta:
         unique_together = ('student', 'talk',)
+
+class Gift(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64)
+    description = models.CharField(max_length=256, null=True)
+    min_presence = models.IntegerField(default=1)
+    total_amount = models.IntegerField(default=0)
+    balance = models.IntegerField(default=0)
+
+class StudentGift(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    gift = models.ForeignKey(Gift, on_delete=models.CASCADE)
+    received = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('student', 'gift',)
