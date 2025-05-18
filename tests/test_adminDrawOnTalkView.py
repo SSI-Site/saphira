@@ -1,4 +1,4 @@
-import datetime
+from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -34,7 +34,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=datetime.datetime.now()
+            date_time=timezone.now()
         )
 
         self.client.force_login(user=self.admin)
@@ -49,7 +49,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=datetime.datetime.now()
+            date_time=timezone.now()
         )
 
         student = Student.objects.create(
