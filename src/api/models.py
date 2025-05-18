@@ -46,6 +46,7 @@ class StudentGift(models.Model):
     gift = models.ForeignKey(Gift, on_delete=models.CASCADE)
     received = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('student', 'gift',)
