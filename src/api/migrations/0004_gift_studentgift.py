@@ -29,6 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
                 ('received', models.BooleanField(default=False)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
                 ('gift', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.gift')),
                 ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='api.student')),
             ],
