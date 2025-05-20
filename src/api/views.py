@@ -418,5 +418,9 @@ class AdminDrawOnTalkView(generics.RetrieveAPIView):
         student = random_presence.student
 
         return Response({
-            'student_name': student.name
+            'id': student.id,
+            'name': student.name,
+            'email': student.email,
+            'code': student.code,
+            'usp_number': student.usp_number,
         })
