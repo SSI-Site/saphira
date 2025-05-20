@@ -54,6 +54,7 @@ Para isso, abra o **PowerShell como Administrador** e execute o seguinte comando
 
 ```powershell
 Set-ExecutionPolicy Bypass
+```
 
 Quando solicitado, pressione `A` para permitir e depois `Enter`.
 
