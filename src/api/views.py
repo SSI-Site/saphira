@@ -215,7 +215,8 @@ class RetrieveStudentPresencesView(generics.ListAPIView):
         presence_list = [
             {
               "talk_title": p.talk.title,
-              "date_time": p.talk.date_time,
+              "start_time": p.talk.start_time,
+              "end_time": p.talk.end_time,
             }
             for p in queryset
         ]

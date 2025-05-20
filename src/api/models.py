@@ -15,7 +15,8 @@ class Talk(models.Model):
     title = models.CharField(max_length=128, unique=True)
     speaker = models.CharField(max_length=128)
     description = models.CharField(max_length=1024, null=True)
-    date_time = models.DateTimeField(unique=True)
+    start_time = models.DateTimeField(unique=True)
+    end_time = models.DateTimeField(unique=True)
 
 class Token(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

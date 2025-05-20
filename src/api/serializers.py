@@ -10,7 +10,8 @@ class StudentSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'email', 'usp_number']
 
 class TalkSerializer(serializers.ModelSerializer):
-    date_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
+    start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
+    end_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
 
     class Meta:
         model = Talk
