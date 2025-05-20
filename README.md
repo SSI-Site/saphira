@@ -25,12 +25,40 @@ A API Saphira oferece os seguintes recursos:
 
 ## Requisitos
 
-- Python 3.8+
+- Python 3.8 até 3.12
 - Django 4.0+
 - Django Rest Framework 3.14+
 - Django Rest Framework Simple JWT 5.2+
 - Firebase Admin SDK
 - PostgreSQL (ou outro banco de dados compatível)
+
+## Requisitos (Windows)
+
+### 1. Instalar o Visual Studio Build Tools
+
+É necessário instalar o **Visual Studio Build Tools** para que sua máquina com Windows consiga compilar os binários de certos pacotes do Python.
+
+🔗 [Download do Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe)
+
+Durante a instalação, selecione a **carga de trabalho "Desenvolvimento para desktop com C++"**.
+
+> 📦 Aproximadamente 4GB de instalação.
+
+---
+
+### 2. Permitir execução de scripts no PowerShell
+
+Certifique-se de que a política de execução de scripts do seu Windows permita que o Python execute scripts livremente.
+
+Para isso, abra o **PowerShell como Administrador** e execute o seguinte comando:
+
+```powershell
+Set-ExecutionPolicy Bypass
+```
+
+Quando solicitado, pressione `A` para permitir e depois `Enter`.
+
+> ⚠️ Isso é necessário para evitar bloqueios ao executar scripts em ambientes virtuais ou durante instalações de dependências.
 
 ## Configuração
 
@@ -49,19 +77,26 @@ A API Saphira oferece os seguintes recursos:
 2. **Configure as variáveis de ambiente**:
 - Defina as variáveis de ambiente para o Firebase e outras configurações no arquivo `.env`.
 
-3. **Aplique as migrações**:
+3. **Configure um ambiente virtual**:
+    ```bash
+    uv venv --python=3.12
+    # Para acessar
+    .venv\Scripts\activate
+    ```
+
+4. **Aplique as migrações**:
 
     ```bash
     uv run src/manage.py migrate
     ```
 
-4. **Crie um superusuário**:
+5. **Crie um superusuário**:
 
     ```bash
     uv run src/manage.py createsuperuser
     ```
 
-5. **Inicie o servidor**:
+6. **Inicie o servidor**:
 
     ```bash
     uv run src/manage.py runserver
