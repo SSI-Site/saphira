@@ -1,12 +1,10 @@
-import datetime
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.test import APIClient, APITestCase, force_authenticate
+from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Presence, Student, Talk, Token
+from api.models import Student, Talk, Token
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
@@ -26,7 +24,8 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=dt.now(ZoneInfo('America/Sao_Paulo'))
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         # Cria estudante
@@ -67,14 +66,15 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(data["error"], "Presença já registrada nessa palestra.")
-        
+
     def test_token_expirado(self):
         # Cria uma palestra
         talk = Talk.objects.create(
             title="Palestra Expirada",
             speaker="Alguém",
             description="Palestra com token expirado",
-            date_time=dt.now(ZoneInfo('America/Sao_Paulo'))
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time = dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         # Cria estudante

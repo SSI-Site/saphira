@@ -1,9 +1,11 @@
 import datetime
+from zoneinfo import ZoneInfo
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIClient, APITestCase, force_authenticate
+from rest_framework.test import APIClient, APITestCase
+from datetime import datetime as dt, timedelta
 
 from api.models import Presence, Student, Talk
 
@@ -34,7 +36,8 @@ class AdminDrawOnTalkTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=datetime.datetime.now()
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         self.client.force_login(user=self.admin)
@@ -49,7 +52,8 @@ class AdminDrawOnTalkTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=datetime.datetime.now()
+            start_time= dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time= dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         student = Student.objects.create(
@@ -57,7 +61,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
             email = "glauber@email.com",
         )
 
-        presence = Presence.objects.create(
+        _presence = Presence.objects.create(
             student=student,
             talk=talk,
         )
