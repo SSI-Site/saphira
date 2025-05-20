@@ -71,7 +71,11 @@ class AdminDrawOnTalkTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
-            "student_name": student.name,
+            'id': student.id,
+            'name': student.name,
+            'email': student.email,
+            'code': student.code,
+            'usp_number': student.usp_number,
         })
 
     # Retorna a url com o talk_id
