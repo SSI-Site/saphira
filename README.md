@@ -34,6 +34,8 @@ A API Saphira oferece os seguintes recursos:
 
 ## Requisitos (Windows)
 
+### 1. Instalar o Visual Studio Build Tools
+
 É necessário instalar o **Visual Studio Build Tools** para que sua máquina com Windows consiga compilar os binários de certos pacotes do Python.
 
 🔗 [Download do Visual Studio Build Tools](https://aka.ms/vs/17/release/vs_BuildTools.exe)
@@ -41,6 +43,21 @@ A API Saphira oferece os seguintes recursos:
 Durante a instalação, selecione a **carga de trabalho "Desenvolvimento para desktop com C++"**.
 
 > 📦 Aproximadamente 4GB de instalação.
+
+---
+
+### 2. Permitir execução de scripts no PowerShell
+
+Certifique-se de que a política de execução de scripts do seu Windows permita que o Python execute scripts livremente.
+
+Para isso, abra o **PowerShell como Administrador** e execute o seguinte comando:
+
+```powershell
+Set-ExecutionPolicy Bypass
+
+Quando solicitado, pressione `A` para permitir e depois `Enter`.
+
+> ⚠️ Isso é necessário para evitar bloqueios ao executar scripts em ambientes virtuais ou durante instalações de dependências.
 
 ## Configuração
 
