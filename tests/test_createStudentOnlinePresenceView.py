@@ -1,12 +1,10 @@
-import datetime
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.test import APIClient, APITestCase, force_authenticate
+from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Presence, Student, Talk, Token
+from api.models import Student, Talk, Token
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from django.utils import timezone
@@ -68,7 +66,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(data["error"], "Presença já registrada nessa palestra.")
-        
+
     def test_token_expirado(self):
         # Cria uma palestra
         talk = Talk.objects.create(

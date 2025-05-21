@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIClient, APITestCase, force_authenticate
+from rest_framework.test import APIClient, APITestCase
+from datetime import datetime as dt, timedelta
 
 from api.models import Presence, Student, Talk
 
@@ -57,7 +58,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
             email = "glauber@email.com",
         )
 
-        presence = Presence.objects.create(
+        _presence = Presence.objects.create(
             student=student,
             talk=talk,
         )
@@ -67,7 +68,11 @@ class AdminDrawOnTalkTestCase(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {
-            "student_name": student.name,
+            'id': student.id,
+            'name': student.name,
+            'email': student.email,
+            'code': student.code,
+            'usp_number': student.usp_number,
         })
 
     # Retorna a url com o talk_id

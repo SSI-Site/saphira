@@ -215,7 +215,8 @@ class RetrieveStudentPresencesView(generics.ListAPIView):
         presence_list = [
             {
               "talk_title": p.talk.title,
-              "date_time": p.talk.date_time,
+              "start_time": p.talk.start_time,
+              "end_time": p.talk.end_time,
             }
             for p in queryset
         ]
@@ -418,5 +419,9 @@ class AdminDrawOnTalkView(generics.RetrieveAPIView):
         student = random_presence.student
 
         return Response({
-            'student_name': student.name
+            'id': student.id,
+            'name': student.name,
+            'email': student.email,
+            'code': student.code,
+            'usp_number': student.usp_number,
         })

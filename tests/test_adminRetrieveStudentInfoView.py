@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.test import APIClient, APITestCase, force_authenticate
+from rest_framework.test import APIClient, APITestCase
+from datetime import datetime as dt, timedelta
 
 from api.models import Presence, Student, Talk
 
