@@ -7,7 +7,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import Student, Talk, Token
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
-from django.utils import timezone
 
 class CreateStudentOnlinePresenceViewTestCase(APITestCase):
 
@@ -25,7 +24,8 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=timezone.now()
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         # Cria estudante
@@ -38,7 +38,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         token = Token.objects.create(
             talk=talk,
             code="12345678",
-            begin=timezone.now(),
+            begin=dt.now(ZoneInfo('America/Sao_Paulo')),
             duration=60,
         )
 
@@ -73,7 +73,8 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
             title="Palestra Expirada",
             speaker="Alguém",
             description="Palestra com token expirado",
-            date_time=timezone.now()
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         # Cria estudante
@@ -87,7 +88,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         token = Token.objects.create(
             talk=talk,
             code="87654321",
-            begin=timezone.now() - timedelta(minutes=10),
+            begin=dt.now(ZoneInfo('America/Sao_Paulo')) - timedelta(minutes=10),
             duration=1,  # 1 minuto de duração, já expirado
         )
 

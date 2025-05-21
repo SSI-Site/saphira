@@ -3,8 +3,8 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
 from api.models import Student, Talk, Presence
-from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime as dt, timedelta
+from zoneinfo import ZoneInfo
 
 class AdminListCreatePresenceViewTestCase(TestCase):
     def setUp(self):
@@ -28,7 +28,8 @@ class AdminListCreatePresenceViewTestCase(TestCase):
             title='Palestra de Teste',
             speaker='Palestrante',
             description='Descrição',
-            date_time=timezone.now() + timedelta(days=1)
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         self.url = reverse('admin-list-create-presence')

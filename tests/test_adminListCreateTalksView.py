@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
-from django.utils.timezone import now, timedelta
+from datetime import datetime as dt, timedelta
+from zoneinfo import ZoneInfo
 
 from api.models import Talk
 
@@ -18,13 +19,15 @@ class AdminListCreateTalksViewTestCase(TestCase):
         )
         self.client.login(username='admin', password='password123')
         self.url = reverse('admin-list-create-talks')
+        self.now = dt.now(ZoneInfo('America/Sao_Paulo'))
 
     def test_create_talk(self):
         data = {
             "title": "Palestra Teste",
             "speaker": "Palestrante",
             "description": "Descrição",
-            "date_time": (now() + timedelta(days=1)).strftime(DATETIME_FORMAT)
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
         }
 
         response = self.client.post(self.url, data, format='json')
@@ -35,7 +38,10 @@ class AdminListCreateTalksViewTestCase(TestCase):
     def test_list_talks(self):
         Talk.objects.create(
             title="Palestra Existente",
-            date_time=now() + timedelta(days=2)
+            speaker="Palestrante",
+            description="Descrição",
+            start_time=self.now,
+            end_time=self.now + timedelta(hours=1)
         )
 
         response = self.client.get(self.url)
@@ -57,20 +63,28 @@ class AdminListCreateTalksViewTestCase(TestCase):
     def test_create_talk_invalid_datetime_format(self):
         data = {
             "title": "Palestra Inválida",
-            "date_time": "2024-13-32T25:70",
+            "start_time": "2024-13-32T25:70", 
+            "end_time": "2024-13-32T26:70", 
             "speaker": "Palestrante"
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
 
-    def test_create_duplicate_talk_title(self):
-        Talk.objects.create(title="Palestra Existente", date_time=now() + timedelta(days=1))
+    def test_create_duplicate_talk_title_and_start_time(self):
+        Talk.objects.create(
+            title="Palestra Existente",
+            speaker="Outro Palestrante",
+            description="Descrição",
+            start_time=self.now,
+            end_time=self.now + timedelta(hours=1)
+        )
 
         data = {
             "title": "Palestra Existente",
-            "date_time": (now() + timedelta(days=2)).strftime(DATETIME_FORMAT),
             "speaker": "Palestrante",
-            "description": "Descrição"
+            "description": "Descrição",
+            "start_time": self.now.isoformat(), 
+            "end_time": (self.now + timedelta(hours=1)).isoformat()
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)

@@ -1,9 +1,9 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
-from django.utils import timezone
+from datetime import datetime as dt, timedelta
+from zoneinfo import ZoneInfo
 from django.urls import reverse
-from datetime import timedelta
 
 from api.models import Talk, Token
 from api.utils import generate_token_code
@@ -23,7 +23,8 @@ class ListCreateTokenViewTestCase(TestCase):
 
         self.talk = Talk.objects.create(
             title="Teste Palestra",
-            date_time=timezone.now() + timedelta(days=1)
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         self.url = reverse('admin-list-create-tokens')
@@ -31,7 +32,7 @@ class ListCreateTokenViewTestCase(TestCase):
     def test_create_token(self):
         data = {
             "talk": self.talk.id,
-            "begin":  (timezone.now() + timedelta(hours=2)).strftime(DATETIME_FORMAT),
+            "begin":  (dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=2)).strftime(DATETIME_FORMAT),
             "duration": 45
         }
 
@@ -43,7 +44,7 @@ class ListCreateTokenViewTestCase(TestCase):
     def test_list_tokens(self):
         Token.objects.create(
             talk=self.talk,
-            begin=timezone.now() + timedelta(hours=1),
+            begin=dt.now(ZoneInfo('America/Sao_Paulo')),
             duration=30,
             code=generate_token_code()
         )
@@ -68,7 +69,7 @@ class ListCreateTokenViewTestCase(TestCase):
     def test_token_code_format(self):
         data = {
             "talk": self.talk.id,
-            "begin": (self.talk.date_time + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+            "begin": (self.talk.start_time + timedelta(hours=1)).strftime(DATETIME_FORMAT),
             "duration": 45
         }
         response = self.client.post(self.url, data, format='json')

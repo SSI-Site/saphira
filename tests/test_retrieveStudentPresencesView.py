@@ -1,7 +1,8 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse
-from django.utils import timezone
+from datetime import datetime as dt, timedelta
+from zoneinfo import ZoneInfo
 from api.models import Student, Talk, Presence
 import uuid
 
@@ -18,14 +19,16 @@ class RetrieveStudentPresencesViewTest(APITestCase):
             title="Palestra 1",
             speaker="Palestrante 1",
             description="Descrição 1",
-            date_time=timezone.now()
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         self.talk2 = Talk.objects.create(
             title="Palestra 2",
             speaker="Palestrante 2",
             description="Descrição 2",
-            date_time=timezone.now()
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         Presence.objects.create(student=self.student, talk=self.talk1)

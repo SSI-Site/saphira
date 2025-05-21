@@ -1,4 +1,5 @@
-from django.utils import timezone
+import datetime
+from zoneinfo import ZoneInfo
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -25,7 +26,8 @@ class AdminRetrieveStudentInfoViewTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            date_time=timezone.now()
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         student1 = Student.objects.create(
