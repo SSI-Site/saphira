@@ -27,8 +27,8 @@ class RetrieveStudentPresencesViewTest(APITestCase):
             title="Palestra 2",
             speaker="Palestrante 2",
             description="Descrição 2",
-            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
-            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo'))  + timedelta(hours=1),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=2)
         )
 
         Presence.objects.create(student=self.student, talk=self.talk1)
