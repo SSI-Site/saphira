@@ -305,6 +305,46 @@ class AdminDestroyStudentView(generics.DestroyAPIView):
         student.delete()
         return Response({'message': f'Estudante {student.name} removido com sucesso.'}, status=status.HTTP_200_OK)
 
+@method_decorator(admin_auth_required, name='delete')
+class AdminUpdateDestroySpeakerView(generics.RetrieveUpdateDestroyAPIView):
+    lookup_field = 'speaker_id'
+
+    def get_object(self):
+        lookup_value = self.kwargs.get(self.lookup_field)
+        speaker = Speaker.objects.filter(id=lookup_value).first()
+
+        if not speaker:
+            raise Http404(f"Palestrante com id {lookup_value} não encontrado.")
+        return speaker
+
+    def put(self, request, *args, **kwargs):
+        speaker = self.get_object()
+        allowed_fields = [
+            'name',
+            'description',
+            'social_media',
+            'pronouns'
+        ]
+
+        for field in allowed_fields:
+            if field in request.data:
+                setattr(speaker, field, request.data[field])
+
+        speaker.save()
+
+        return Response({
+            'id': speaker.id,
+            'name': speaker.name,
+            'description': speaker.description,
+            'social_media': speaker.social_media,
+            'pronouns': speaker.pronouns,
+        })
+
+    def delete(self, request, *args, **kwargs):
+        speaker = self.get_object()
+        speaker.delete()
+        return Response({'message': f'Palestrante {speaker.name} removido com sucesso.'}, status=status.HTTP_200_OK)
+
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateTalksView(generics.ListCreateAPIView):
     queryset = Talk.objects.all()
