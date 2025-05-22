@@ -51,3 +51,11 @@ class StudentGift(models.Model):
 
     class Meta:
         unique_together = ('student', 'gift',)
+
+class Speaker(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=128)
+    description = models.CharField(max_length=1024, null=True)
+    social_media = models.CharField(max_length=128, null=True)
+    pronouns = models.CharField(max_length=32, null=True)
+    role = models.CharField(max_length=64)
