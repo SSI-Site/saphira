@@ -1,5 +1,6 @@
 from api.models import Gift, Student, StudentGift
 from django.test import TestCase
+from api.utils import update_gift_balance
 
 class GiftModelTestCase(TestCase):
     def test_create_gift(self):
@@ -30,7 +31,7 @@ class StudentGiftRelationTestCase(TestCase):
             description="Chaveiro do evento",
             min_presence=1,
             total_amount=5,
-            balance=5
+            balance=0
         )
         # Cria a relação entre estudante e gift
         student_gift = StudentGift.objects.create(
@@ -42,3 +43,10 @@ class StudentGiftRelationTestCase(TestCase):
         self.assertEqual(student_gift.student, student)
         self.assertEqual(student_gift.gift, gift)
         self.assertTrue(student_gift.received)
+
+        # Atualiza o balanço de Gifts
+
+        update_gift_balance(gift)
+
+        # Verifica se o balanço foi atualizado corretamente
+        self.assertEqual(gift.balance, 1)
