@@ -52,8 +52,8 @@ class AdminDrawOnTalkTestCase(APITestCase):
             title="Palestra do Neymar",
             speaker="Neymar",
             description="A palestra do neymar",
-            start_time= dt.now(ZoneInfo('America/Sao_Paulo')),
-            end_time= dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         student = Student.objects.create(

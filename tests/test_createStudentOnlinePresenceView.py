@@ -74,7 +74,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
             speaker="Alguém",
             description="Palestra com token expirado",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
-            end_time = dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
 
         # Cria estudante
