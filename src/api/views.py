@@ -414,6 +414,11 @@ class AdminListCreatePresenceView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             presence = serializer.save()
+
+            # Atualiza o saldo do Gift se o aluno tiver direito a algum
+            student = presence.student
+            check_and_assign_gifts(student)
+
             return Response(self.get_serializer(presence).data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
