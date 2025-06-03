@@ -81,6 +81,15 @@ class CreatePresenceSerializer(serializers.ModelSerializer):
         presence = Presence.objects.create(student=student, talk=talk, **validated_data)
         return presence
 
+class SpeakerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Speaker
+        fields = ['name', 'description', 'social_media', 'pronouns', 'role']
+
+    def create(self, validated_data):
+        speaker = Speaker.objects.create(**validated_data)
+        return speaker
+
 class AdminSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True, style={'input_type': 'password'})

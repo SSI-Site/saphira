@@ -249,6 +249,21 @@ class AdminListStudentsByNameView(generics.ListAPIView):
         return Response(list(students))
 
 @method_decorator(admin_auth_required, name='dispatch')
+class AdminCreateSpeakerView(generics.CreateAPIView):
+    serializer_class = SpeakerSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(
+                {"message": "Palestrante criado com sucesso.", "speaker": serializer.data},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         student_document = self.kwargs.get('student_document')
@@ -399,6 +414,11 @@ class AdminListCreatePresenceView(generics.ListCreateAPIView):
 
         if serializer.is_valid():
             presence = serializer.save()
+
+            # Atualiza o saldo do Gift se o aluno tiver direito a algum
+            student = presence.student
+            check_and_assign_gifts(student)
+
             return Response(self.get_serializer(presence).data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
