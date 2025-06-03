@@ -205,6 +205,19 @@ class CreateStudentOnlinePresenceView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 @method_decorator(student_auth_required, name='dispatch')
+class RetrieveSpeakerByNameView(generics.ListAPIView):
+    serializer_class = SpeakerSerializer
+
+    def get_queryset(self):
+        name = self.kwargs.get('name')
+        return Speaker.objects.filter(name__icontains=name)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        speakers = self.serializer_class(queryset, many=True).data
+        return Response(speakers)
+
+@method_decorator(student_auth_required, name='dispatch')
 class RetrieveStudentPresencesView(generics.ListAPIView):
     def get_queryset(self):
         student_id = self.kwargs.get('student_id')
