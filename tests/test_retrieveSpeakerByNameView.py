@@ -31,20 +31,7 @@ class RetrieveSpeakerByNameViewTestCase(APITestCase):
             pronouns="ela/dela"
         )
 
-        self.student = Student.objects.create(
-            name='Aluno',
-            email='aluno@example.com',
-            usp_number='87654321',
-            code='B123'
-        )
-
-    def authenticate(self):
-        refresh = RefreshToken.for_user(self.student)
-        access_token = str(refresh.access_token)
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access_token}')
-
     def test_retrieve_speaker_by_exact_name(self):
-        self.authenticate()
         url = reverse('retrieve-speaker-by-name', kwargs={'name': 'Maria Silva'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -52,7 +39,6 @@ class RetrieveSpeakerByNameViewTestCase(APITestCase):
         self.assertEqual(response.data[0]['name'], "Maria Silva")
 
     def test_retrieve_speaker_by_partial_name(self):
-        self.authenticate()
         url = reverse('retrieve-speaker-by-name', kwargs={'name': 'Maria'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -63,7 +49,6 @@ class RetrieveSpeakerByNameViewTestCase(APITestCase):
         self.assertEqual(len(response.data), 2)
 
     def test_retrieve_speaker_by_name_not_found(self):
-        self.authenticate()
         url = reverse('retrieve-speaker-by-name', kwargs={'name': 'Fulano'})
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
