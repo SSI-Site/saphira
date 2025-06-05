@@ -20,7 +20,7 @@ urlpatterns = [
     path('student/<uuid:student_id>', StudentRetrieveUpdateView.as_view(), name='student-retrieve-update'),
     path('student/<uuid:student_id>/presence', CreateStudentOnlinePresenceView.as_view(), name='create-student-online-presence'),
     path('student/<uuid:student_id>/presences', RetrieveStudentPresencesView.as_view(), name='retrieve-student-presences'),
-    path('speakers/<name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
+    path('speakers/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
 
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
