@@ -4,8 +4,9 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
+from uuid import uuid4
 
-from api.models import Talk
+from api.models import Talk, Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
@@ -18,13 +19,22 @@ class AdminListCreateTalksViewTestCase(TestCase):
             password='password123'
         )
         self.client.login(username='admin', password='password123')
+
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         self.url = reverse('admin-list-create-talks')
         self.now = dt.now(ZoneInfo('America/Sao_Paulo'))
 
     def test_create_talk(self):
         data = {
             "title": "Palestra Teste",
-            "speaker": "Palestrante",
+            "speaker": self.speaker.id,
             "description": "Descrição",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
@@ -38,7 +48,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
     def test_list_talks(self):
         Talk.objects.create(
             title="Palestra Existente",
-            speaker="Palestrante",
+            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
@@ -65,7 +75,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
             "title": "Palestra Inválida",
             "start_time": "2024-13-32T25:70", 
             "end_time": "2024-13-32T26:70", 
-            "speaker": "Palestrante"
+            "speaker": self.speaker.id
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
@@ -73,7 +83,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
     def test_create_duplicate_talk_title_and_start_time(self):
         Talk.objects.create(
             title="Palestra Existente",
-            speaker="Outro Palestrante",
+            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
@@ -81,10 +91,24 @@ class AdminListCreateTalksViewTestCase(TestCase):
 
         data = {
             "title": "Palestra Existente",
-            "speaker": "Palestrante",
+            "speaker": self.speaker.id,
             "description": "Descrição",
             "start_time": self.now.isoformat(), 
             "end_time": (self.now + timedelta(hours=1)).isoformat()
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
+
+    def test_inexistent_speaker_exception(self):
+        inexistent_id = uuid4()
+        data = {
+            "title": "Palestra Teste",
+            "speaker": inexistent_id,
+            "description": "Descrição",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['error'], f"Palestrante com id {inexistent_id} não encontrado(a).")

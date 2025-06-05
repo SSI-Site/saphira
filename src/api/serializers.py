@@ -17,7 +17,6 @@ class TalkSerializer(serializers.ModelSerializer):
         model = Talk
         fields = '__all__'
         extra_kwargs = {
-            'speaker': {'required': False, 'allow_blank': True, 'help_text': 'Opcional'},
             'description': {'required': False, 'allow_blank': True, 'help_text': 'Opcional'},
         }
 

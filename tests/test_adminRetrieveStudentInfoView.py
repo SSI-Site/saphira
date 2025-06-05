@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 from datetime import datetime as dt, timedelta
 
-from api.models import Presence, Student, Talk
+from api.models import Presence, Student, Talk, Speaker
 
 class AdminRetrieveStudentInfoViewTestCase(APITestCase):
 
@@ -22,9 +22,17 @@ class AdminRetrieveStudentInfoViewTestCase(APITestCase):
 
     def test_valid_student_with_presence(self):
         """Testa o endpoint com dois estudantes. Um deles com presença e outro sem"""
+        speaker = Speaker.objects.create(
+            name="Neymar",
+            description="Menino Ney",
+            social_media="@neymar.jr",
+            pronouns="ele/dele",
+            role="Jogador de bola"
+        )
+
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker="Neymar",
+            speaker=speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)

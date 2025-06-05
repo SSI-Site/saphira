@@ -10,10 +10,18 @@ class Student(models.Model):
     usp_number = models.CharField(max_length=8, unique=True, null=True, blank=True)
     code = models.CharField(max_length=4, unique=True, null=True, blank=True)
 
+class Speaker(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=64)
+    description = models.CharField(max_length=512, null=True)
+    social_media = models.CharField(max_length=64, null=True)
+    pronouns = models.CharField(max_length=16, null=True)
+    role = models.CharField(max_length=64)
+
 class Talk(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, unique=True)
-    speaker = models.CharField(max_length=128)
+    speaker = models.ForeignKey(Speaker, on_delete=models.CASCADE)
     description = models.CharField(max_length=1024, null=True)
     start_time = models.DateTimeField(unique=True)
     end_time = models.DateTimeField(unique=True)
@@ -51,14 +59,6 @@ class StudentGift(models.Model):
 
     class Meta:
         unique_together = ('student', 'gift',)
-
-class Speaker(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64)
-    description = models.CharField(max_length=512, null=True)
-    social_media = models.CharField(max_length=64, null=True)
-    pronouns = models.CharField(max_length=16, null=True)
-    role = models.CharField(max_length=64)
 
 class DrawWinner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
