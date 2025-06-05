@@ -3,7 +3,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
-from api.models import Student, Talk, Presence
+from api.models import Student, Talk, Presence, Speaker
 import uuid
 
 class RetrieveStudentPresencesViewTest(APITestCase):
@@ -15,11 +15,19 @@ class RetrieveStudentPresencesViewTest(APITestCase):
             code='B123'
         )
 
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         base_time = dt.now(ZoneInfo('America/Sao_Paulo'))
 
         self.talk1 = Talk.objects.create(
             title="Palestra 1",
-            speaker="Palestrante 1",
+            speaker=self.speaker,
             description="Descrição 1",
             start_time=base_time,
             end_time=base_time + timedelta(hours=1)
@@ -27,7 +35,7 @@ class RetrieveStudentPresencesViewTest(APITestCase):
 
         self.talk2 = Talk.objects.create(
             title="Palestra 2",
-            speaker="Palestrante 2",
+            speaker=self.speaker,
             description="Descrição 2",
             start_time=base_time + timedelta(hours=2),  # Garante unicidade
             end_time=base_time + timedelta(hours=3)

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
-from api.models import Gift, Student, StudentGift, Talk, Presence
+from api.models import Gift, Student, StudentGift, Talk, Presence, Speaker
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
@@ -24,9 +24,17 @@ class AdminListCreatePresenceViewTestCase(TestCase):
             code='A123'
         )
 
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         self.talk = Talk.objects.create(
             title='Palestra de Teste',
-            speaker='Palestrante',
+            speaker=self.speaker,
             description='Descrição',
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
@@ -105,12 +113,20 @@ class StudentGiftAssignmentAPITestCase(TestCase):
             email="teste@email.com",
             usp_number="12345678"
         )
+
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
         # Cria palestras
         base_time = dt.now(ZoneInfo('America/Sao_Paulo'))
         self.talks = [
             Talk.objects.create(
                 title=f"Palestra {i}",
-                speaker=f"Palestrante {i}",
+                speaker=self.speaker,
                 description=f"Descrição {i}",
                 start_time=base_time + timedelta(hours=i*2),
                 end_time=base_time + timedelta(hours=i*2+1)

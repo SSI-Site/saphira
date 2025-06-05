@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
-from api.models import Student, Talk, Presence
+from api.models import Student, Talk, Presence, Speaker
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
@@ -24,9 +24,17 @@ class AdminDestroyPresenceViewTestCase(TestCase):
             code='B123'
         )
 
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         self.talk = Talk.objects.create(
             title='Palestra',
-            speaker='Palestrante',
+            speaker=self.speaker,
             description='Descrição',
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)

@@ -5,7 +5,7 @@ from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from django.urls import reverse
 
-from api.models import Talk, Token
+from api.models import Talk, Token, Speaker
 from api.utils import generate_token_code
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -21,8 +21,17 @@ class ListCreateTokenViewTestCase(TestCase):
         )
         self.client.login(username='admin', password='password123')
 
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         self.talk = Talk.objects.create(
             title="Teste Palestra",
+            speaker=self.speaker,
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )

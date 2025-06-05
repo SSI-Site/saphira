@@ -6,7 +6,7 @@ from django.test import TestCase
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
-from api.models import Talk
+from api.models import Talk, Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
@@ -21,9 +21,17 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
             password='adminSSIpassword'
         )
 
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         self.talk = Talk.objects.create(
             title="Palestra Teste",
-            speaker="Palestrante",
+            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
@@ -38,7 +46,7 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
 
         response_data = response.json()
         self.assertEqual(response_data['title'], self.talk.title)
-        self.assertEqual(response_data['speaker'], self.talk.speaker)
+        self.assertEqual(response_data['speaker'], str(self.talk.speaker.id))
         self.assertEqual(response_data['description'], self.talk.description)
 
     def test_retrieve_talk_unauthenticated(self):
@@ -49,7 +57,7 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
     def test_update_talk_authenticated_admin(self):
         updated_data = {
             "title": "Palestra Atualizada",
-            "speaker": "Novo Palestrante",
+            "speaker": self.speaker.id,
             "description": "Nova Descrição",
             "start_time": (self.now + timedelta(days=2)).strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(days=2, hours=1)).strftime(DATETIME_FORMAT)
@@ -60,7 +68,7 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
 
         self.talk.refresh_from_db()
         self.assertEqual(self.talk.title, updated_data['title'])
-        self.assertEqual(self.talk.speaker, updated_data['speaker'])
+        self.assertEqual(self.talk.speaker.id, updated_data['speaker'])
 
     def test_update_talk_invalid_data(self):
         invalid_data = {
@@ -74,8 +82,16 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
         self.assertIn('title', response.json())
 
     def test_partial_update_talk_authenticated_admin(self):
+        speaker = Speaker.objects.create(
+            name="Palestrante Teste 2",
+            description="Descrição do palestrante 2",
+            social_media="@palestranteteste2",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
         partial_data = {
-            "speaker": "Palestrante Modificado",
+            "speaker": speaker.id,
             "description": "Descrição Modificada"
         }
 
@@ -83,7 +99,7 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         self.talk.refresh_from_db()
-        self.assertEqual(self.talk.speaker, partial_data['speaker'])
+        self.assertEqual(self.talk.speaker, speaker)
         self.assertEqual(self.talk.description, partial_data['description'])
 
     def test_delete_talk_authenticated_admin(self):
@@ -105,7 +121,7 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
 
         updated_data = {
             "title": "Inexistente",
-            "speaker": "Alguém",
+            "speaker": self.speaker.id,
             "description": "Nada",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)

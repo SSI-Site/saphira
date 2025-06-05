@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Student, Talk, Token
+from api.models import Student, Talk, Token, Speaker
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
@@ -18,11 +18,19 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
             password="1234"
         )
 
+        self.speaker = Speaker.objects.create(
+            name="Palestrante Teste",
+            description="Descrição do palestrante",
+            social_media="@palestranteteste",
+            pronouns="ele/dele",
+            role="Palestrante"
+        )
+
     def test_valid_student_with_presence(self):
         # Cria uma palestra
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker="Neymar",
+            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
@@ -71,7 +79,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         # Cria uma palestra
         talk = Talk.objects.create(
             title="Palestra Expirada",
-            speaker="Alguém",
+            speaker=self.speaker,
             description="Palestra com token expirado",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo'))  + timedelta(hours=1),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=2)

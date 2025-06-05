@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 from datetime import datetime as dt, timedelta
 
-from api.models import Presence, Student, Talk
+from api.models import Presence, Student, Talk, Speaker
 
 class AdminDrawOnTalkTestCase(APITestCase):
 
@@ -17,6 +17,14 @@ class AdminDrawOnTalkTestCase(APITestCase):
             username="test_admin",
             email="foo@example.com",
             password="1234"
+        )
+
+        self.speaker = Speaker.objects.create(
+            name="Neymar",
+            description="Grande menino Ney em sua skin palestrante",
+            social_media="@neymar.jr",
+            pronouns="ele/dele",
+            role="Jogador de fut"
         )
 
 
@@ -34,7 +42,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
         """Testa o endpoint com uma palestra valida mas sem presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker="Neymar",
+            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
@@ -50,7 +58,7 @@ class AdminDrawOnTalkTestCase(APITestCase):
         """Testa o endpoint com uma palestra valida mas com presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker="Neymar",
+            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
