@@ -40,6 +40,22 @@ def check_and_assign_gifts(student):
             update_gift_balance(gift)
             break  # Atribui apenas um gift por presença mínima atendida
 
+def check_and_remove_gifts(student):
+    # Obter todos os gifts atribuídos ao aluno
+    student_gifts = StudentGift.objects.filter(student=student)
+
+    # Verifica quantas presenças o aluno tem
+    presence_count = student.presence_set.count()
+
+    # Valida os gifts atribuídos
+    for student_gift in student_gifts:
+        gift = student_gift.gift
+        # Se o aluno não atende mais ao critério de presença mínima, remove o gift
+        if presence_count < gift.min_presence:
+            student_gift.delete()
+            # Atualiza o saldo do gift
+            update_gift_balance(gift)
+
 class UUIDConverter:
     regex = '[0-9a-fA-F-]+'  # Regex para UUID com hífens
 

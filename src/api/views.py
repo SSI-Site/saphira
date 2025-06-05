@@ -464,6 +464,10 @@ class AdminDestroyPresenceView(generics.DestroyAPIView):
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         presence.delete()
+
+        # Verifica se o aluno ainda tem direito a algum Gift
+        check_and_remove_gifts(presence.student)
+        
         return Response({'message': 'Presença removida com sucesso.'}, status=status.HTTP_200_OK)
 
 @method_decorator(admin_auth_required, name='dispatch')

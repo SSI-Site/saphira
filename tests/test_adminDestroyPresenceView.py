@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
-from api.models import Student, Talk, Presence, Speaker
+from api.models import Student, Talk, Presence, Speaker, Gift, StudentGift
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
@@ -72,6 +72,27 @@ class AdminDestroyPresenceViewTestCase(TestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 404)
         self.assertIn('Estudante com documento', response.data.get('detail', ''))
+
+    def test_delete_presence_for_student_with_gift_that_now_is_not_eligible(self):
+        # Cria um gift que exige 1 presença mínima
+        gift = Gift.objects.create(
+            name='Gift Teste',
+            description='Descrição do gift',
+            min_presence=1,
+            total_amount=10,
+            balance=10
+        )
+
+        # Atribui o gift ao aluno
+        StudentGift.objects.create(student=self.student, gift=gift)
+
+        # Remove a presença do aluno
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['message'], 'Presença removida com sucesso.')
+
+        # Verifica se o aluno não tem mais o gift
+        self.assertFalse(StudentGift.objects.filter(student=self.student, gift=gift).exists())
 
     def test_delete_presence_unauthorized_user(self):
         self.client.logout()
