@@ -83,11 +83,12 @@ class CreatePresenceSerializer(serializers.ModelSerializer):
 class SpeakerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Speaker
-        fields = ['name', 'description', 'social_media', 'pronouns', 'role']
+        fields = ['id', 'name', 'description', 'social_media', 'pronouns', 'role']
 
     def create(self, validated_data):
         speaker = Speaker.objects.create(**validated_data)
         return speaker
+        
 
 class AdminSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)

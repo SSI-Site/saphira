@@ -55,6 +55,25 @@ class AdminLogoutView(APIView):
         response = Response({'message': 'Parabéns, agora você não é mais admin :('}, status=status.HTTP_200_OK)
         response.delete_cookie('sessionid')
         return response
+    
+class RetrieveSpeakerByNameView(generics.ListAPIView):
+    def get_queryset(self):
+        name = self.kwargs.get('name')
+        return Speaker.objects.filter(name__icontains=name)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        speakers = [
+            {
+                'id': speaker.id,
+                'name': speaker.name,
+                'description': speaker.description,
+                'social_media': speaker.social_media,
+                'pronouns': speaker.pronouns
+            }
+            for speaker in queryset
+        ]
+        return Response(speakers)
 
 
 ############################################################################################################
