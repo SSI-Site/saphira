@@ -78,3 +78,17 @@ class AdminListCreateGiftsViewTestCase(APITestCase):
         }
         response = self.client.post(self.url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_List_gifts(self):
+        data = {
+            "name": "Brinde Teste",
+            "description": "Descrição do brinde",
+            "min_presence": 1,
+            "total_amount": 10
+        }
+        response = self.client.post(self.url, data, format="json")
+
+        response = self.client.get(self.url + "?name=" + data['name'], format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['name'], "Brinde Teste")
