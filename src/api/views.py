@@ -464,8 +464,8 @@ class AdminListCreateGiftsView(generics.ListCreateAPIView):
     
     def get(self, request, *args, **kwargs):
         queryset = Gift.objects.filter(
-            models.Q(id=kwargs.get('id')) |
-            models.Q(name=kwargs.get('name'))
+            models.Q(id=request.GET.get('id')) |
+            models.Q(name=request.GET.get('name'))
         )
         serializer = GiftSerializer(queryset, many=True)
         return Response(serializer.data)
