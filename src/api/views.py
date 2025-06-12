@@ -81,6 +81,18 @@ class RetrieveSpeakersView(generics.RetrieveAPIView):
     def get(self, request, *args, **kwargs):
         speakers = self.get_queryset().values('id', 'name', 'description', 'social_media', 'pronouns', 'role')
         return Response(list(speakers))
+    
+class ListRetrieveGiftsView(generics.ListAPIView):
+    serializer_class = GiftSerializer
+
+    def get(self, request, *args, **kwargs):
+        queryset = Gift.objects.filter(
+            models.Q(id=request.GET.get('id', None)) |
+            models.Q(name__startswith=request.GET.get('name', ''))
+        )
+        #apenas id, name e min_presence
+        gifts = queryset.values('id', 'name', 'min_presence')
+        return Response(list(gifts), status=status.HTTP_200_OK)
 
 ############################################################################################################
 #                                         FIREBASE REQUIRED VIEWS
