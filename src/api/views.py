@@ -448,6 +448,27 @@ class AdminListCreatePresenceView(generics.ListCreateAPIView):
             return Response(self.get_serializer(presence).data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminListCreateGiftsView(generics.ListCreateAPIView):
+    def post(self, request, *args, **kwargs):
+        serializer = GiftSerializer(data=request.data)
+
+        if serializer.is_valid():
+            gift = serializer.save()
+            return Response(
+                serializer.data,
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request, *args, **kwargs):
+        queryset = Gift.objects.filter(
+            models.Q(id=request.GET.get('id')) |
+            models.Q(name__startswith=request.GET.get('name'))
+        )
+        serializer = GiftSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDestroyPresenceView(generics.DestroyAPIView):
