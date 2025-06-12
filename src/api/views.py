@@ -75,6 +75,12 @@ class RetrieveSpeakerByNameView(generics.ListAPIView):
         ]
         return Response(speakers)
 
+class RetrieveSpeakersView(generics.RetrieveAPIView):
+    queryset = Speaker.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        speakers = self.get_queryset().values('id', 'name', 'description', 'social_media', 'pronouns', 'role')
+        return Response(list(speakers))
 
 ############################################################################################################
 #                                         FIREBASE REQUIRED VIEWS
