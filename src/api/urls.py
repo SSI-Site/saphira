@@ -10,6 +10,7 @@ register_converter(UUIDConverter, 'uuid')
 urlpatterns = [
     # Public endpoints
     path('', views.index, name='index'),
+    path('speakers', RetrieveSpeakersView.as_view(), name='list-speakers'),
     path('speakers/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
     path('admin/login', AdminLoginView.as_view(), name='admin-login'),
     path('admin/logout', AdminLogoutView.as_view(), name='admin-logout'),
