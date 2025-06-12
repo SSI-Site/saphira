@@ -14,6 +14,7 @@ urlpatterns = [
     path('speakers/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
     path('admin/login', AdminLoginView.as_view(), name='admin-login'),
     path('admin/logout', AdminLogoutView.as_view(), name='admin-logout'),
+    path('gifts', ListRetrieveGiftsView.as_view(), name='list-retrieve-gifts'),
 
     # Firebase endpoints (student)
     path('student/login', StudentLogin.as_view(), name='student-login'),
