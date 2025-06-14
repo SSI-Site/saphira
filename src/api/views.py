@@ -487,6 +487,49 @@ class AdminListCreateGiftsView(generics.ListCreateAPIView):
         )
         serializer = GiftSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminUpdateDestroyGiftView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = GiftSerializer
+    lookup_field = 'id'
+
+    def get_queryset(self):
+        return Gift.objects.all()
+
+    def get_object(self):
+        lookup_value = self.kwargs.get(self.lookup_field)
+        gift = self.get_queryset().filter(id=lookup_value).first()
+
+        if not gift:
+            raise Http404(f"Gift com id {lookup_value} não encontrado.")
+        return gift
+    
+    def delete(self, request, *args, **kwargs):
+        gift = self.get_object()
+        gift.delete()
+        return Response({'message': f'Gift {gift.name} removido com sucesso.'}, status=status.HTTP_200_OK)
+    
+    def put(self, request, *args, **kwargs):
+        gift = self.get_object()
+        allowed_fields = ['name', 'description', 'total_amount', 'min_presence']
+
+        for field in allowed_fields:
+            if field in request.data:
+                setattr(gift, field, request.data[field])
+
+        gift.save()
+
+        # Caso o minPresence tenha sido alterado, validar os StudentGifts para que apenas estudantes com presenças mínimas o tenham
+        check_and_remove_gifts_from_gift(gift)
+
+        return Response({
+            'id': gift.id,
+            'name': gift.name,
+            'description': gift.description,
+            'min_presence': gift.min_presence,
+            'total_amount': gift.total_amount,
+            'balance': gift.balance
+        })
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDestroyPresenceView(generics.DestroyAPIView):
