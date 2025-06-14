@@ -1,7 +1,7 @@
 import random
 import string
 from uuid import UUID
-from api.models import Gift, Student, StudentGift
+from api.models import Gift, Student, StudentGift, Presence
 
 datetime_url_format = "%Y-%m-%dT%H:%M"
 
@@ -25,7 +25,7 @@ def update_gift_balance (gift):
 
 def check_and_assign_gifts(student):
     # Contar presenças do aluno
-    presence_count = student.presence_set.count()
+    presence_count = Presence.objects.filter(student=student).count()
 
     # Obter todos os gifts disponíveis
     gifts = Gift.objects.filter(min_presence__lte=presence_count, balance__gt=0)
@@ -40,12 +40,12 @@ def check_and_assign_gifts(student):
             update_gift_balance(gift)
             break  # Atribui apenas um gift por presença mínima atendida
 
-def check_and_remove_gifts(student):
+def check_and_remove_gifts(student: Student):
     # Obter todos os gifts atribuídos ao aluno
     student_gifts = StudentGift.objects.filter(student=student)
 
     # Verifica quantas presenças o aluno tem
-    presence_count = student.presence_set.count()
+    presence_count = Presence.objects.filter(student=student).count()
 
     # Valida os gifts atribuídos
     for student_gift in student_gifts:
@@ -54,6 +54,21 @@ def check_and_remove_gifts(student):
         if presence_count < gift.min_presence:
             student_gift.delete()
             # Atualiza o saldo do gift
+            update_gift_balance(gift)
+
+def check_and_remove_gifts_from_gift(gift: Gift):
+    student_gifts = StudentGift.objects.filter(gift=gift)
+
+    for student_gift in student_gifts:
+        student = student_gift.student
+
+        # Verifica quantas presenças o aluno tem
+        presence_count = Presence.objects.filter(student=student).count()
+
+        # Se o número de presenças for menor
+        if presence_count < gift.min_presence:
+            student_gift.delete()
+            # Atualiza o saldo
             update_gift_balance(gift)
 
 class UUIDConverter:
