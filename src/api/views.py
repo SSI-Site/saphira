@@ -16,6 +16,7 @@ from .decorators import *
 from .models import *
 from .serializers import *
 from .utils import *
+from uuid import UUID
 
 
 ############################################################################################################
@@ -597,3 +598,12 @@ class AdminDrawOnTalkView(generics.RetrieveAPIView):
             'code': student.code,
             'usp_number': student.usp_number,
         })
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminListWinnerView(generics.ListAPIView):
+    queryset = DrawWinner.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        draw_winners = self.get_queryset().values('id', 'student', 'talk')
+
+        return Response(list(draw_winners))
