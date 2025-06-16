@@ -39,7 +39,8 @@ urlpatterns = [
     path('admin/speakers/<uuid:speaker_id>', AdminUpdateDestroySpeakerView.as_view(), name='admin-update-destroy-speaker'),
     path('admin/speakers', AdminCreateSpeakerView.as_view(), name='admin-create-speaker'),
     path('admin/gifts', AdminListCreateGiftsView.as_view(), name='admin-list-create-gifts'),
-    path('admin/gifts/<uuid:id>', AdminUpdateDestroyGiftView.as_view(), name='admin-update-destroy-gift')
+    path('admin/gifts/<uuid:id>', AdminUpdateDestroyGiftView.as_view(), name='admin-update-destroy-gift'),
+    path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes
