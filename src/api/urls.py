@@ -41,6 +41,7 @@ urlpatterns = [
     path('admin/gifts', AdminListCreateGiftsView.as_view(), name='admin-list-create-gifts'),
     path('admin/gifts/<uuid:id>', AdminUpdateDestroyGiftView.as_view(), name='admin-update-destroy-gift'),
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
+    path('admin/winners/<uuid:student_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes
