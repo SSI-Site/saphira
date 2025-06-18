@@ -607,3 +607,22 @@ class AdminListWinnerView(generics.ListAPIView):
         draw_winners = self.get_queryset().values('id', 'student', 'talk')
 
         return Response(list(draw_winners))
+    
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminDestroyWinnerView(generics.DestroyAPIView):
+    lookup_field = 'student_id'
+
+    def get_queryset(self):
+        return DrawWinner.objects.all()
+
+    def get_object(self):
+        object = self.get_queryset().filter(student_id=self.kwargs.get(self.lookup_field)).first()
+        if not object:
+            raise Http404('Vencedor não encontrado.')
+        return object
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.delete()
+
+        return Response({'message': 'Vencedor removido com sucesso.'}, status=status.HTTP_200_OK)
