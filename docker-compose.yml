@@ -1,0 +1,94 @@
+services:
+  database:
+    image: postgres:alpine
+    container_name: saphira-db
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    profiles:
+      - production
+      - dev
+    restart: unless-stopped
+
+  migrations:
+    build: .
+    container_name: saphira-migrations
+    user: root
+    command: >
+      sh -c "python manage.py makemigrations --no-input &&
+          python manage.py migrate --no-input &&
+          python manage.py collectstatic --no-input
+      "
+    volumes:
+      - static:/app/static
+    env_file:
+      - .env
+    develop:
+      watch:
+        - path: "src"
+          action: sync+restart
+          target: /app
+        - action: rebuild
+          path: uv.lock
+    profiles:
+      - production
+      - dev
+    depends_on:
+      - database
+
+  saphira-api-prod:
+    build: .
+    container_name: saphira-api-prod
+    ports:
+      - 8000:8000
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    profiles:
+      - production
+    restart: unless-stopped
+
+  saphira-api-dev:
+    build: .
+    container_name: saphira-api-dev
+    entrypoint: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+    ports:
+      - 8000:8000
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
+    env_file:
+      - .env
+    profiles:
+      - dev
+    develop:
+      watch:
+        - path: src
+          action: sync
+          target: /app
+          ignore: __pycache__/**
+    restart: unless-stopped
+
+  saphira-web:
+    image: nginx:stable-alpine
+    container_name: saphira-web
+    ports:
+      - 80:80
+      - 443:443
+    profiles:
+      - production
+    depends_on:
+      - saphira-api-prod
+    volumes:
+      - static:/app/static:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  static:
