@@ -27,4 +27,4 @@ jobs:
         env:
           COMPOSE_BAKE: true
         run: |
-          docker compose --profile test up --build --exit-code-from tests tests
+          docker compose --profile test up --build --exit-code-from tests
