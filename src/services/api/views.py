@@ -1,3 +1,7 @@
+from datetime import datetime as dt, timedelta
+from zoneinfo import ZoneInfo
+
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.http import Http404
 from django.utils.decorators import method_decorator
@@ -417,3 +421,20 @@ class AdminListCreateWinner(generics.ListCreateAPIView):
             'student': draw_winner.student_id,
             'talk': draw_winner.talk_id,
         }, status=status.HTTP_201_CREATED)
+
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminRetrieveWinnerByStudentView (generics.RetrieveAPIView):
+    lookup_field = 'student_id'
+
+    def get_queryset(self):
+        return DrawWinner.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        student_id = self.kwargs.get(self.lookup_field)
+        winners = self.get_queryset().filter(student_id=student_id).values('id', 'student', 'talk')
+
+        if not winners.exists():
+            raise Http404('Nenhum sorteio vencido encontrado para este estudante.')
+
+        return Response(list(winners), status=status.HTTP_200_OK)

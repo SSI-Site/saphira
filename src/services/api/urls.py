@@ -1,5 +1,4 @@
 from django.urls import path, register_converter
-from django.urls.conf import include
 
 from api import views
 from api.utils import UUIDConverter
