@@ -8,30 +8,26 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.11, 3.12]
     steps:
-    - uses: actions/checkout@v4
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        uv sync --no-dev --locked
-    - name: Add secrets.json
-      run: |
-        echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
-    - name: Run Tests
-      env:
-        SAPHIRA_ENV: ${{ vars.SAPHIRA_ENV }}
-        SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
-        SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
-      run: |
-       uv run src/manage.py test tests
+      - name: Create .env.test with enviroment variables
+        uses: SpicyPizza/create-envfile@v2.0
+        with:
+          file_name: .env.test
+          fail_on_empty: true
+          envkey_SAPHIRA_ENV: ${{vars.SAPHIRA_ENV}}
+          envkey_SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
+          envkey_SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
+
+          envkey_POSTGRES_DB: action-db
+          envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          envkey_POSTGRES_HOST: database-test
+          envkey_POSTGRES_PORT: 5432
+      - name: Add firebase-key.json from secrets
+        run: |
+          echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
+
+      - uses: actions/checkout@v4
+      - name: Run docker compose in test profile
+        run: |
+          docker-compose --profile test up --build --exit-code-from tests tests
