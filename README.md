@@ -64,6 +64,11 @@ Para encerrar o Docker use:
 docker compose --profile dev down
 ```
 
+Encerrar o Docker **não** apaga a base de dados, se quiser fazer isso, você precisa apagar os _volumes_, um conjunto de arquivo que permanece entre execuções do Docker. Para fazer isso use:
+```bash
+docker compose --profile dev down --volumes
+```
+
 Se quiser saber mais sobre o Docker confira sua [documentação](https://docs.docker.com/)
 
 ## Requisitos (Instalação Manual)

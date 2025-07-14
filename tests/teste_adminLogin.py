@@ -17,7 +17,7 @@ class AdminLoginViewTestCase(TestCase):
 
         # Define a URL testada
         self.url = reverse('admin-login')
-    
+
     def test_login_admin_sucess(self):
         #Dados de login corretos
         data = {

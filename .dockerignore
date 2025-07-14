@@ -3,6 +3,4 @@
 .git
 *venv*
 **/__pycache__/**
-tests/**
-*test*.py
 .github

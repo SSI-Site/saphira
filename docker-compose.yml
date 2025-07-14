@@ -14,16 +14,22 @@ services:
     restart: unless-stopped
 
   migrations:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
     container_name: saphira-migrations
     user: root
     command: >
       sh -c "python manage.py makemigrations --no-input &&
           python manage.py migrate --no-input &&
-          python manage.py collectstatic --no-input
+          python manage.py collectstatic --no-input &&
+          python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USER --email $DJANGO_SUPERUSER_EMAIL
       "
     volumes:
       - static:/app/static
+    environment:
+      PATH: /app/.venv/bin:$PATH
     env_file:
       - .env
     develop:
@@ -40,7 +46,10 @@ services:
       - database
 
   saphira-api-prod:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
     container_name: saphira-api-prod
     ports:
       - 8000:8000
@@ -54,7 +63,10 @@ services:
     restart: unless-stopped
 
   saphira-api-dev:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
     container_name: saphira-api-dev
     entrypoint: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
     ports:
@@ -88,6 +100,69 @@ services:
       - static:/app/static:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     restart: unless-stopped
+
+  database-test:
+    image: postgres:alpine
+    container_name: saphira-db-test
+    ports:
+      - 5432:5432
+    env_file:
+      - .env.test
+    profiles:
+      - test
+    restart: on-failure
+
+  migrations-test:
+    build:
+        context: .
+        dockerfile: Dockerfile
+        target: base
+    container_name: saphira-migrations
+    user: root
+    command: >
+      sh -c "python manage.py makemigrations --no-input &&
+          python manage.py migrate --no-input &&
+          python manage.py collectstatic --no-input
+      "
+    volumes:
+      - static:/app/static
+    env_file:
+      - .env.test
+    environment:
+      PATH: /app/.venv/bin:$PATH
+    develop:
+      watch:
+        - path: src
+          action: sync+restart
+          target: /app
+        - action: rebuild
+          path: uv.lock
+    profiles:
+      - test
+    depends_on:
+      - database-test
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: saphira-tests
+    env_file:
+      - .env.test
+    depends_on:
+      migrations-test:
+        condition: service_completed_successfully
+      database-test:
+        condition: service_started
+    profiles:
+      - test
+    develop:
+      watch:
+        - action: sync+restart
+          path: tests
+          target: /app/tests
+    command: python manage.py test
 
 volumes:
   pg_data:

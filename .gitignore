@@ -66,4 +66,6 @@ drf_example
 # *api/migrations/*
 .env
 .env.prod
+.env.dev
+.env.test
 firebase-key.json
