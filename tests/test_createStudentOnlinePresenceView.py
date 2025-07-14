@@ -40,7 +40,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         student1 = Student.objects.create(
             name="Glauber",
             email="glauber@email.com",
-            usp_number="023456789",
+            usp_number="02345678",
         )
 
         token = Token.objects.create(
@@ -89,7 +89,7 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         student1 = Student.objects.create(
             name="Glauber",
             email="glauber@email.com",
-            usp_number="023456789",
+            usp_number="02345678",
         )
 
         # Cria token já expirado (begin no passado, duração curta)
