@@ -117,7 +117,7 @@ services:
         context: .
         dockerfile: Dockerfile
         target: base
-    container_name: saphira-migrations
+    container_name: saphira-migrations-test
     user: root
     command: >
       sh -c "python manage.py makemigrations --no-input &&

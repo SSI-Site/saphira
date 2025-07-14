@@ -24,5 +24,7 @@ jobs:
         run: |
           echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
       - name: Run docker compose in test profile
+        env:
+          COMPOSE_BAKE: true
         run: |
           docker compose --profile test up --build --exit-code-from tests tests
