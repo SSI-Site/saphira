@@ -18,12 +18,57 @@ A API Saphira oferece os seguintes recursos:
 
 - **Autenticação**: Login e logout para administradores, login para estudantes.
 - **Gerenciamento de Estudantes**: Criação, recuperação, atualização e exclusão de estudantes.
-- **Gerenciamento de Presenças**: Registro e recuperação de presenças de estudantes em palestras.
+- **Gerenciamento de Presenças**: Registro e recuperação de presenças de estudantes em presenças.
 - **Gerenciamento de Palestras**: Criação, recuperação, atualização e exclusão de palestras.
+- **Gerenciamento de Palestrantes**: Criação, recuperação, atualização e listagem de palestrantes
 - **Gerenciamento de Tokens**: Criação e listagem de tokens para presenças.
-<!-- - **Gerenciamento de Brindes**: Criação, recuperação, atualização e exclusão de brindes. -->
+- **Gerenciamento de Brindes**: Criação, recuperação, atualização e exclusão de brindes.
 
-## Requisitos
+## Requisitos (Instalação Docker)
+
+Recomenda-se usar a instalação por Docker, uma vez que simplifica a instalação de dependências e aproxima o desenvolvedor de um contexto de _deploy_.
+- Docker
+- Docker Desktop
+
+### Instalar o Docker e o Docker Desktop
+
+Vá ao site oficial do [Docker](https://www.docker.com/), clique em **Download** e siga os passos para seu sistema operacional. Certifique-se que ambas aplicações foram instaladas, abra o Docker Desktop no seu dispositivo, ou rode o comando `docker --version` no seu terminal.
+
+### Configuração
+
+1. **Clone o repositório**:
+  ```bash
+  git clone git@github.com:SSI-Site/saphira.git
+  ```
+
+2. **Configure as variáveis de ambiente**:
+- Defina as variáveis de ambiente para o Firebase e outras configurações no arquivo `.env`. Lembre-se a aplicação não funcionará corretamente se isto não estiver configurado.
+
+3. **Inicie a instância do Docker**:
+Execute o seguinte comando para rodar o docker em modo de desenvolvimento:
+```bash
+docker compose --profile dev up -d
+```
+Isto deixará o docker em segundo plano, para conferir o resultado rode: `docker compose logs`. Ou se preferir manter o docker em primeiro plano:
+```bash
+docker compose --profile dev watch
+```
+
+Para rodar em modo de produção use:
+```bash
+docker compose --profile production up -d
+```
+
+Para encerrar o Docker use:
+```bash
+docker compose --profile dev down
+```
+
+Se quiser saber mais sobre o Docker confira sua [documentação](https://docs.docker.com/)
+
+## Requisitos (Instalação Manual)
+
+Essa é uma forma alternativa de rodar o saphira
 
 - Python 3.8 até 3.12
 - Django 4.0+
@@ -60,7 +105,7 @@ Quando solicitado, pressione `A` para permitir e depois `Enter`.
 
 > ⚠️ Isso é necessário para evitar bloqueios ao executar scripts em ambientes virtuais ou durante instalações de dependências.
 
-## Configuração
+### Configuração
 
 0. **Instale o uv package manager**:
   ```bash
