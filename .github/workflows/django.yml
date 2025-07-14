@@ -30,4 +30,4 @@ jobs:
       - uses: actions/checkout@v4
       - name: Run docker compose in test profile
         run: |
-          docker-compose --profile test up --build --exit-code-from tests tests
+          docker compose --profile test up --build --exit-code-from tests tests
