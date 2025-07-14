@@ -15,16 +15,25 @@ jobs:
           echo "SAPHIRA_ENV=${{vars.SAPHIRA_ENV}}" >> .env.test
           echo "SAPHIRA_JWT_SECRET_KEY=${{ secrets.SAPHIRA_JWT_SECRET_KEY }}" >> .env.test
           echo "SAPHIRA_ALLOWED_HOSTS=${{ vars.SAPHIRA_ALLOWED_HOSTS }}" >> .env.test
-          echo "POSTGRES_DB=action-db" >> .env.test
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.test
+
+          echo "POSTGRES_DB=${{ vars.POSTGRES_DB }}" >> .env.test
+          echo "POSTGRES_USER=${{ vars.POSTGRES_USER }}" >> .env.test
           echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.test
           echo "POSTGRES_HOST=database-test" >> .env.test
           echo "POSTGRES_PORT=5432" >> .env.test
-      - name: Add firebase-key.json from secrets
-        run: |
-          echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
+
+          echo "FIREBASE_TYPE=${{ secrets.FIREBASE_TYPE }}" >> .env.test
+          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> .env.test
+          echo "FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}" >> .env.test
+          echo 'FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"' >> .env.test
+          echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> .env.test
+          echo "FIREBASE_CLIENT_ID=${{ secrets.FIREBASE_CLIENT_ID }}" >> .env.test
+          echo "FIREBASE_AUTH_URI=${{ secrets.FIREBASE_AUTH_URI }}" >> .env.test
+          echo "FIREBASE_TOKEN_URI=${{ secrets.FIREBASE_TOKEN_URI }}" >> .env.test
+          echo "FIREBASE_AUTH_PROVIDER_X509_CERT_URL=${{ secrets.FIREBASE_AUTH_PROVIDER_X509_CERT_URL }}" >> .env.test
+          echo "FIREBASE_CLIENT_X509_CERT_URL=${{ secrets.FIREBASE_CLIENT_X509_CERT_URL }}" >> .env.test
+          echo "FIREBASE_UNIVERSE_DOMAIN=${{ secrets.FIREBASE_UNIVERSE_DOMAIN }}" >> .env.test
+
       - name: Run docker compose in test profile
-        env:
-          COMPOSE_BAKE: true
         run: |
           docker compose --profile test up --build --exit-code-from tests
