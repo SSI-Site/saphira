@@ -9,25 +9,20 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Create .env.test with enviroment variables
-        uses: SpicyPizza/create-envfile@v2.0
-        with:
-          file_name: .env.test
-          fail_on_empty: true
-          envkey_SAPHIRA_ENV: ${{vars.SAPHIRA_ENV}}
-          envkey_SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
-          envkey_SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
-
-          envkey_POSTGRES_DB: action-db
-          envkey_POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          envkey_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
-          envkey_POSTGRES_HOST: database-test
-          envkey_POSTGRES_PORT: 5432
+        run: |
+          echo "SAPHIRA_ENV=${{vars.SAPHIRA_ENV}}" >> .env.test
+          echo "SAPHIRA_JWT_SECRET_KEY=${{ secrets.SAPHIRA_JWT_SECRET_KEY }}" >> .env.test
+          echo "SAPHIRA_ALLOWED_HOSTS=${{ vars.SAPHIRA_ALLOWED_HOSTS }}" >> .env.test
+          echo "POSTGRES_DB=action-db" >> .env.test
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env.test
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.test
+          echo "POSTGRES_HOST=database-test" >> .env.test
+          echo "POSTGRES_PORT=5432" >> .env.test
       - name: Add firebase-key.json from secrets
         run: |
           echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
-
-      - uses: actions/checkout@v4
       - name: Run docker compose in test profile
         run: |
           docker compose --profile test up --build --exit-code-from tests tests
