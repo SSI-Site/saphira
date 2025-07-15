@@ -112,36 +112,6 @@ services:
       - test
     restart: on-failure
 
-  migrations-test:
-    build:
-        context: .
-        dockerfile: Dockerfile
-        target: base
-    container_name: saphira-migrations-test
-    user: root
-    command: >
-      sh -c "python manage.py makemigrations --no-input &&
-          python manage.py migrate --no-input &&
-          python manage.py collectstatic --no-input
-      "
-    volumes:
-      - static:/app/static
-    env_file:
-      - .env.test
-    environment:
-      PATH: /app/.venv/bin:$PATH
-    develop:
-      watch:
-        - path: src
-          action: sync+restart
-          target: /app
-        - action: rebuild
-          path: uv.lock
-    profiles:
-      - test
-    depends_on:
-      - database-test
-
   tests:
     build:
       context: .
@@ -151,8 +121,6 @@ services:
     env_file:
       - .env.test
     depends_on:
-      migrations-test:
-        condition: service_completed_successfully
       database-test:
         condition: service_started
     profiles:
@@ -162,7 +130,12 @@ services:
         - action: sync+restart
           path: tests
           target: /app/tests
-    command: python manage.py test
+    command: >
+      sh -c "python manage.py makemigrations --no-input &&
+          python manage.py migrate --no-input &&
+          python manage.py collectstatic --no-input &&
+          python manage.py test
+      "
 
 volumes:
   pg_data:
