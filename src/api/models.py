@@ -10,6 +10,9 @@ class Student(models.Model):
     usp_number = models.CharField(max_length=8, unique=True, null=True, blank=True)
     code = models.CharField(max_length=4, unique=True, null=True, blank=True)
 
+    def __str__(self) -> str:
+        return self.name
+
 class Speaker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
@@ -17,6 +20,9 @@ class Speaker(models.Model):
     social_media = models.CharField(max_length=64, null=True)
     pronouns = models.CharField(max_length=16, null=True)
     role = models.CharField(max_length=64)
+
+    def __str__(self) -> str:
+        return self.name
 
 class Talk(models.Model):
     id = models.AutoField(primary_key=True)
@@ -26,12 +32,18 @@ class Talk(models.Model):
     start_time = models.DateTimeField(unique=True)
     end_time = models.DateTimeField(unique=True)
 
+    def __str__(self) -> str:
+        return f"{self.speaker.name} - '{self.title}'"
+
 class Token(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     talk = models.ForeignKey(Talk, on_delete=models.CASCADE)
     code = models.CharField(max_length=8, unique=True)
     begin = models.DateTimeField()
     duration = models.IntegerField()
+
+    def __str__(self) -> str:
+        return f"{self.code} - '{self.talk}'"
 
 class Presence(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -41,6 +53,9 @@ class Presence(models.Model):
     class Meta:
         unique_together = ('student', 'talk',)
 
+    def __str__(self) -> str:
+        return f"{self.student} na palestra '{self.talk}'"
+
 class Gift(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=64)
@@ -48,6 +63,9 @@ class Gift(models.Model):
     min_presence = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     total_amount = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     balance = models.IntegerField(default=0) # Não tem validador pois é atualizado automaticamente. Se for negativo, precisam ser corrigidos manualmente.
+
+    def __str__(self) -> str:
+        return self.name
 
 class StudentGift(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -60,6 +78,9 @@ class StudentGift(models.Model):
     class Meta:
         unique_together = ('student', 'gift',)
 
+    def __str__(self) -> str:
+        return f"{self.student} - {self.gift}, recebido = {self.received}"
+
 class DrawWinner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -67,3 +88,6 @@ class DrawWinner(models.Model):
 
     class Meta:
         unique_together = ('student', 'talk',)
+
+    def __str__(self) -> str:
+        return f"{self.student} na palestra '{self.talk}'"
