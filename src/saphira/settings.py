@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
     'rest_framework',
+    'drf_spectacular',
     'api',
     'corsheaders',
 ]
@@ -89,6 +90,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny', # Por padrão, todas as rotas são públicas
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema' # Usa o Swagger UI pra mostrar todos os endpoints do sistema
 }
 
 SIMPLE_JWT = {
