@@ -11,7 +11,7 @@ class Student(models.Model):
     code = models.CharField(max_length=4, unique=True, null=True, blank=True)
 
     def __str__(self) -> str:
-        return self.name
+        return f"Student: {self.name}"
 
 class Speaker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,7 +22,7 @@ class Speaker(models.Model):
     role = models.CharField(max_length=64)
 
     def __str__(self) -> str:
-        return self.name
+        return f"Speaker: {self.name}"
 
 class Talk(models.Model):
     id = models.AutoField(primary_key=True)
@@ -33,7 +33,7 @@ class Talk(models.Model):
     end_time = models.DateTimeField(unique=True)
 
     def __str__(self) -> str:
-        return f"{self.speaker.name} - '{self.title}'"
+        return f"Talk: {self.speaker.name} - '{self.title}'"
 
 class Token(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -43,7 +43,7 @@ class Token(models.Model):
     duration = models.IntegerField()
 
     def __str__(self) -> str:
-        return f"{self.code} - '{self.talk}'"
+        return f"Token: {self.code} - '{self.talk}'"
 
 class Presence(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -54,7 +54,7 @@ class Presence(models.Model):
         unique_together = ('student', 'talk',)
 
     def __str__(self) -> str:
-        return f"{self.student} na palestra '{self.talk}'"
+        return f"Presence: {self.student} na palestra '{self.talk}'"
 
 class Gift(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -65,7 +65,7 @@ class Gift(models.Model):
     balance = models.IntegerField(default=0) # Não tem validador pois é atualizado automaticamente. Se for negativo, precisam ser corrigidos manualmente.
 
     def __str__(self) -> str:
-        return self.name
+        return f"Gift: {self.name}"
 
 class StudentGift(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -79,7 +79,7 @@ class StudentGift(models.Model):
         unique_together = ('student', 'gift',)
 
     def __str__(self) -> str:
-        return f"{self.student} - {self.gift}, recebido = {self.received}"
+        return f"StudentGift: {self.student} - {self.gift}, recebido = {self.received}"
 
 class DrawWinner(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -90,4 +90,4 @@ class DrawWinner(models.Model):
         unique_together = ('student', 'talk',)
 
     def __str__(self) -> str:
-        return f"{self.student} na palestra '{self.talk}'"
+        return f"Winner: {self.student} na palestra '{self.talk}'"
