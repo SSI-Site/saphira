@@ -74,8 +74,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework',
     'drf_spectacular',
-    'api',
     'corsheaders',
+    'api',
 ]
 
 REST_FRAMEWORK = {
@@ -215,6 +215,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# DRF Spectecular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Saphira API',
+    'DESCRIPTION': 'Serviço REST API para o gerenciamento de informações na Semana de Sistemas de Informação',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 
 # Internationalization
