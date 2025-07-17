@@ -82,6 +82,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'corsheaders',
     'api',
+    'students'
 ]
 
 REST_FRAMEWORK = {
