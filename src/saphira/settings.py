@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 from os import getenv
 from sys import exit
+import sys
+import os
 
 from dotenv import load_dotenv
 
@@ -24,6 +26,10 @@ from .firebase_config import *  # Importa a inicialização do Firebase
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Adiciona services para o PYTHON_PATH, tornando seus módulos visiveis ao modulo saphira
+# Permite importar modulos sem escrever services.*
+sys.path.append(os.path.join(BASE_DIR, 'services'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
