@@ -1,9 +1,11 @@
 from django.urls import path, register_converter
+from django.urls.conf import include
 
 from api import views
 from api.utils import UUIDConverter
 
 from .views import *
+from students.urls import admin_students_urls, admin_student_urls
 
 register_converter(UUIDConverter, 'uuid')
 
@@ -16,20 +18,9 @@ urlpatterns = [
     path('admin/logout', AdminLogoutView.as_view(), name='admin-logout'),
     path('gifts', ListRetrieveGiftsView.as_view(), name='list-retrieve-gifts'),
 
-    # Firebase endpoints (student)
-    path('student/login', StudentLogin.as_view(), name='student-login'),
-
-    # Student endpoints
-    path('student/<uuid:student_id>', StudentRetrieveUpdateView.as_view(), name='student-retrieve-update'),
-    path('student/<uuid:student_id>/presence', CreateStudentOnlinePresenceView.as_view(), name='create-student-online-presence'),
-    path('student/<uuid:student_id>/presences', RetrieveStudentPresencesView.as_view(), name='retrieve-student-presences'),
-
+    path('student', include('students.urls')),
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
-    path('admin/students', AdminListStudentsView.as_view(), name='admin-list-students'),
-    path('admin/students/search/<name>', AdminListStudentsByNameView.as_view(), name='admin-list-students-by-name'),
-    path('admin/student/<student_document>', AdminRetrieveStudentInfoView.as_view(), name='admin-retrieve-student-info'),
-    path('admin/students/<student_document>', AdminDestroyStudentView.as_view(), name='admin-destroy-student'),
     path('admin/talks', AdminListCreateTalksView.as_view(), name='admin-list-create-talks'),
     path('admin/talk/<int:pk>', AdminRetrieveUpdateDestroyTalkView.as_view(), name='admin-retrieve-update-destroy-talk'),
     path('admin/tokens', AdminListCreateTokensView.as_view(), name='admin-list-create-tokens'),
@@ -42,6 +33,9 @@ urlpatterns = [
     path('admin/gifts/<uuid:id>', AdminUpdateDestroyGiftView.as_view(), name='admin-update-destroy-gift'),
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
     path('admin/winners/<uuid:student_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
+
+    path('admin/students', include(admin_students_urls)),
+    path('admin/student', include(admin_student_urls)),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes

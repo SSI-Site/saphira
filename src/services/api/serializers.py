@@ -3,11 +3,7 @@ from rest_framework import serializers
 from .models import *
 from .utils import *
 
-
-class StudentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Student
-        fields = ['id', 'name', 'email', 'usp_number']
+from students.models import Student
 
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
@@ -66,8 +62,8 @@ class CreatePresenceSerializer(serializers.ModelSerializer):
         talk = validated_data.pop('talk')
 
         student = Student.objects.filter(
-            models.Q(email=student_document) | 
-            models.Q(code=student_document.upper()) | 
+            models.Q(email=student_document) |
+            models.Q(code=student_document.upper()) |
             models.Q(usp_number=student_document)
         ).first()
 
@@ -88,7 +84,7 @@ class SpeakerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         speaker = Speaker.objects.create(**validated_data)
         return speaker
-    
+
 class GiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gift
@@ -104,7 +100,7 @@ class GiftSerializer(serializers.ModelSerializer):
             balance=validated_data.get('total_amount', 0)  # Inicialmente, o saldo é igual ao total
         )
         return gift
-        
+
 
 class AdminSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
