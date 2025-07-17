@@ -5,13 +5,6 @@ from api.models import Gift, Student, StudentGift, Presence
 
 datetime_url_format = "%Y-%m-%dT%H:%M"
 
-def generate_unique_code(length=3):
-    characters = string.ascii_uppercase + string.digits
-    while True:
-        code = ''.join(random.choices(characters, k=length))
-        if not Student.objects.filter(code=code).exists():
-            break
-    return code
 
 def generate_token_code():
     return "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
