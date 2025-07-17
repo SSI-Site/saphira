@@ -18,6 +18,7 @@ dependencies = [
     "django-cors-headers==4.4.0",
     "djangorestframework==3.15.2",
     "djangorestframework-simplejwt==5.3.1",
+    "drf-spectacular>=0.28.0",
     "firebase-admin==6.5.0",
     "google-api-core[grpc]==2.19.1",
     "google-api-python-client==2.141.0",
