@@ -18,7 +18,7 @@ urlpatterns = [
     path('admin/logout', AdminLogoutView.as_view(), name='admin-logout'),
     path('gifts', ListRetrieveGiftsView.as_view(), name='list-retrieve-gifts'),
 
-    path('student', include('students.urls')),
+    path('student/', include('students.urls')),
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
     path('admin/talks', AdminListCreateTalksView.as_view(), name='admin-list-create-talks'),
@@ -34,8 +34,8 @@ urlpatterns = [
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
     path('admin/winners/<uuid:student_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
 
-    path('admin/students', include(admin_students_urls)),
-    path('admin/student', include(admin_student_urls)),
+    path('admin/students/', include(admin_students_urls)),
+    path('admin/student/', include(admin_student_urls)),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes

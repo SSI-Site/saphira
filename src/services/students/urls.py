@@ -10,13 +10,13 @@ student_urls = [
 ]
 
 admin_students_urls = [
-    path('admin/students', views.AdminListStudentsView.as_view(), name='admin-list-students'),
-    path('admin/students/search/<name>', views.AdminListStudentsByNameView.as_view(), name='admin-list-students-by-name'),
-    path('admin/students/<student_document>', views.AdminDestroyStudentView.as_view(), name='admin-destroy-student'),
+    path('', views.AdminListStudentsView.as_view(), name='admin-list-students'),
+    path('search/<name>', views.AdminListStudentsByNameView.as_view(), name='admin-list-students-by-name'),
+    path('<student_document>', views.AdminDestroyStudentView.as_view(), name='admin-destroy-student'),
 ]
 
 admin_student_urls = [
-    path('admin/student/<student_document>', views.AdminRetrieveStudentInfoView.as_view(), name='admin-retrieve-student-info'),
+    path('<student_document>', views.AdminRetrieveStudentInfoView.as_view(), name='admin-retrieve-student-info'),
 ]
 
 urlpatterns = student_urls
