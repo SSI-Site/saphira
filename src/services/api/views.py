@@ -386,3 +386,18 @@ class AdminDestroyWinnerView(generics.DestroyAPIView):
         obj.delete()
 
         return Response({'message': 'Vencedor removido com sucesso.'}, status=status.HTTP_200_OK)
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminListCreateWinner(generics.ListAPIView):
+    serializer_class = DrawWinnerSerializer
+    queryset = DrawWinner.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        talk_id = self.kwargs.get('talk_id')
+
+        talk = Talk.objects.filter(id=talk_id).first()
+        if not talk:
+            return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
+
+        draw_winners = DrawWinner.objects.filter(talk=talk_id).values('id', 'talk', 'student')
+        return Response(list(draw_winners))
