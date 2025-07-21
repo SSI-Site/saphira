@@ -1,6 +1,4 @@
-from django.test import TestCase
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
 from django.urls import reverse
 from api.models import Student, DrawWinner, Speaker, Talk
 from datetime import datetime as dt, timedelta
@@ -44,7 +42,7 @@ class AdminDestroyWinnerViewTestCase(APITestCase):
             talk=talk
         )
 
-        url = reverse('admin-destroy-winner', kwargs={'student_id': student.id})
+        url = reverse('admin-destroy-winner', kwargs={'winner_id': winner.id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['message'], 'Vencedor removido com sucesso.')
@@ -53,6 +51,6 @@ class AdminDestroyWinnerViewTestCase(APITestCase):
     def test_delete_nonexistent_winner(self):
         # Tenta deletar um vencedor que não existe
         fake_id = uuid.uuid4()
-        url = reverse('admin-destroy-winner', kwargs={'student_id': fake_id})
+        url = reverse('admin-destroy-winner', kwargs={'winner_id': fake_id})
         response = self.client.delete(url)
         self.assertEqual(response.status_code, 404)
