@@ -5,6 +5,8 @@ from services.api import views
 from services.api.views import *
 
 from services.api.utils import UUIDConverter
+from services.gifts.urls import admin_gifts_urls
+from services.students.urls import admin_students_urls, admin_student_urls
 
 register_converter(UUIDConverter, 'uuid')
 
@@ -12,7 +14,7 @@ urlpatterns = [
     # Public endpoints
     path('', views.index, name='index'),
     path('speakers', RetrieveSpeakersView.as_view(), name='list-speakers'),
-    path('speakers/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
+    path('speaker/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
     path('admin/login', AdminLoginView.as_view(), name='admin-login'),
     path('admin/logout', AdminLogoutView.as_view(), name='admin-logout'),
 
@@ -31,9 +33,9 @@ urlpatterns = [
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
     path('admin/winners/<uuid:student_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
 
-    path('admin/students/', include('services.students.urls')),
-    path('admin/student/', include('services.students.urls')),
-    path('admin/gifts/', include('services.gifts.urls')),
+    path('admin/students/', include(admin_students_urls)),
+    path('admin/student/', include(admin_student_urls)),
+    path('admin/gifts/', include(admin_gifts_urls)),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes
