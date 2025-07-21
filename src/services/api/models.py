@@ -1,9 +1,9 @@
 import uuid
 
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
 
 from students.models import Student
+from gifts.models import Gift
 
 class Speaker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -47,17 +47,6 @@ class Presence(models.Model):
 
     def __str__(self) -> str:
         return f"Presence: {self.student} na palestra '{self.talk}'"
-
-class Gift(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=64)
-    description = models.CharField(max_length=256, null=True)
-    min_presence = models.IntegerField(default=1, validators=[MinValueValidator(1)])
-    total_amount = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    balance = models.IntegerField(default=0) # Não tem validador pois é atualizado automaticamente. Se for negativo, precisam ser corrigidos manualmente.
-
-    def __str__(self) -> str:
-        return f"Gift: {self.name}"
 
 class StudentGift(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
