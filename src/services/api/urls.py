@@ -31,7 +31,8 @@ urlpatterns = [
     path('admin/speaker/<uuid:speaker_id>', AdminUpdateDestroySpeakerView.as_view(), name='admin-update-destroy-speaker'),
     path('admin/speakers', AdminCreateSpeakerView.as_view(), name='admin-create-speaker'),
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
-    path('admin/winners/students/<uuid:student_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
+    path('admin/winners/<uuid:winner_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
+    path('admin/winners/students/<uuid:student_id>', AdminRetrieveWinnerByStudentView.as_view(), name='admin-retrieve-winner-by-student'),
     path('admin/winners/talks/<int:talk_id>', AdminListCreateWinner.as_view(), name='admin-list-create-winner'),
 
     path('admin/students/', include(admin_students_urls)),

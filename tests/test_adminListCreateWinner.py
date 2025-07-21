@@ -11,7 +11,7 @@ import uuid
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
-class RetrieveSpeakerViewTestCase(APITestCase):
+class AdminListCreateWinnerTestCase(APITestCase):
     def setUp(self):
         self.client = APIClient()
         User.objects.create_superuser(

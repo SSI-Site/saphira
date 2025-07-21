@@ -1,3 +1,8 @@
+from datetime import datetime as dt, timedelta
+from zoneinfo import ZoneInfo
+
+from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.http import Http404
 from django.utils.decorators import method_decorator
@@ -287,16 +292,17 @@ class AdminListWinnerView(generics.ListAPIView):
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDestroyWinnerView(generics.DestroyAPIView):
-    lookup_field = 'student_id'
+    serializer_class = DrawWinnerSerializer
+    lookup_url_kwarg = 'winner_id'
 
     def get_queryset(self):
         return DrawWinner.objects.all()
 
     def get_object(self):
-        object = self.get_queryset().filter(student_id=self.kwargs.get(self.lookup_field)).first()
-        if not object:
+        obj = self.get_queryset().filter(id=self.kwargs.get(self.lookup_url_kwarg)).first()
+        if not obj:
             raise Http404('Vencedor não encontrado.')
-        return object
+        return obj
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
@@ -343,3 +349,20 @@ class AdminListCreateWinner(generics.ListCreateAPIView):
             'student': draw_winner.student_id,
             'talk': draw_winner.talk_id,
         }, status=status.HTTP_201_CREATED)
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminRetrieveWinnerByStudentView(generics.RetrieveAPIView):
+    serializer_class = DrawWinnerSerializer
+    lookup_url_kwarg = 'student_id'
+
+    def get_queryset(self):
+        return DrawWinner.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        student_id = self.kwargs.get(self.lookup_url_kwarg)
+        draw_winners = self.get_queryset().filter(student_id=student_id).values('id', 'talk', 'student')
+
+        if not draw_winners:
+            return Response({'error': f"Não há brindes registrados para alune de id {student_id}."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(list(draw_winners))
