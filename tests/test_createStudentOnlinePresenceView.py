@@ -4,7 +4,8 @@ from rest_framework import status
 from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.models import Student, Talk, Token, Speaker
+from services.api.models import Talk, Token, Speaker
+from services.students.models import Student
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
