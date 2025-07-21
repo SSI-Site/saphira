@@ -1,11 +1,12 @@
 from django.urls import path, register_converter
 from django.urls.conf import include
 
-from api import views
-from api.utils import UUIDConverter
+from services.api import views
+from services.api.views import *
 
-from .views import *
-from students.urls import admin_students_urls, admin_student_urls
+from services.api.utils import UUIDConverter
+from services.gifts.urls import admin_gifts_urls
+from services.students.urls import admin_students_urls, admin_student_urls
 
 register_converter(UUIDConverter, 'uuid')
 
@@ -13,12 +14,12 @@ urlpatterns = [
     # Public endpoints
     path('', views.index, name='index'),
     path('speakers', RetrieveSpeakersView.as_view(), name='list-speakers'),
-    path('speakers/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
+    path('speaker/<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
     path('admin/login', AdminLoginView.as_view(), name='admin-login'),
     path('admin/logout', AdminLogoutView.as_view(), name='admin-logout'),
-    path('gifts', ListRetrieveGiftsView.as_view(), name='list-retrieve-gifts'),
 
-    path('student/', include('students.urls')),
+    path('student/', include('services.students.urls')),
+    path('gifts/', include('services.gifts.urls')),
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
     path('admin/talks', AdminListCreateTalksView.as_view(), name='admin-list-create-talks'),
@@ -29,8 +30,6 @@ urlpatterns = [
     path('admin/<talk_id>/draw', AdminDrawOnTalkView.as_view(), name='admin-draw-on-talk'),
     path('admin/speaker/<uuid:speaker_id>', AdminUpdateDestroySpeakerView.as_view(), name='admin-update-destroy-speaker'),
     path('admin/speakers', AdminCreateSpeakerView.as_view(), name='admin-create-speaker'),
-    path('admin/gifts', AdminListCreateGiftsView.as_view(), name='admin-list-create-gifts'),
-    path('admin/gifts/<uuid:id>', AdminUpdateDestroyGiftView.as_view(), name='admin-update-destroy-gift'),
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
     path('admin/winners/<uuid:winner_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
     path('admin/winners/students/<uuid:student_id>', AdminRetrieveWinnerByStudentView.as_view(), name='admin-retrieve-winner-by-student'),
@@ -38,6 +37,7 @@ urlpatterns = [
 
     path('admin/students/', include(admin_students_urls)),
     path('admin/student/', include(admin_student_urls)),
+    path('admin/gifts/', include(admin_gifts_urls)),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes

@@ -3,7 +3,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 from django.test import TestCase
-from api.models import Student
+from services.students.models import Student
 
 class AdminListStudentsViewTestCase(TestCase):
     def setUp(self):
