@@ -366,16 +366,17 @@ class AdminListWinnerView(generics.ListAPIView):
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDestroyWinnerView(generics.DestroyAPIView):
-    lookup_field = 'student_id'
+    serializer_class = DrawWinnerSerializer
+    lookup_url_kwarg = 'winner_id'
 
     def get_queryset(self):
         return DrawWinner.objects.all()
 
     def get_object(self):
-        object = self.get_queryset().filter(student_id=self.kwargs.get(self.lookup_field)).first()
-        if not object:
+        obj = self.get_queryset().filter(id=self.kwargs.get(self.lookup_url_kwarg)).first()
+        if not obj:
             raise Http404('Vencedor não encontrado.')
-        return object
+        return obj
 
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
