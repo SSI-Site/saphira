@@ -12,9 +12,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
-from api.models import Presence, Token
-from api.serializers import OnlinePresenceSerializer
+from services.api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
+from services.api.models import Presence, Token
+from services.api.serializers import OnlinePresenceSerializer
 from .serializers import StudentSerializer
 from .models import Student
 

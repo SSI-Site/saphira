@@ -6,7 +6,8 @@ from django.urls import reverse
 from django.test import TestCase
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
-from api.models import Student, Talk, Speaker, DrawWinner
+from services.api.models import Talk, Speaker, DrawWinner
+from services.students.models import Student
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 

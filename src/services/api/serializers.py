@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import *
 from .utils import *
 
-from students.models import Student
+from services.students.models import Student
 
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
@@ -85,21 +85,6 @@ class SpeakerSerializer(serializers.ModelSerializer):
         speaker = Speaker.objects.create(**validated_data)
         return speaker
 
-class GiftSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Gift
-        fields = ['id', 'name', 'description', 'min_presence', 'total_amount', 'balance']
-
-    def create(self, validated_data):
-        gift = Gift.objects.create(
-            id=validated_data.get('id', None),
-            name=validated_data['name'],
-            description=validated_data.get('description', None),
-            min_presence=validated_data.get('min_presence', 1),
-            total_amount=validated_data.get('total_amount', 0),
-            balance=validated_data.get('total_amount', 0)  # Inicialmente, o saldo é igual ao total
-        )
-        return gift
 
 class DrawWinnerSerializer(serializers.ModelSerializer):
     student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
@@ -112,6 +97,7 @@ class DrawWinnerSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         draw_winner = DrawWinner.objects.create(**validated_data)
         return draw_winner
+
 
 class AdminSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)

@@ -27,7 +27,7 @@ urlpatterns = [
     path('api/token/refresh', TokenRefreshView.as_view(), name='token-refresh'),
     # path('api/token/verify', TokenVerifyView.as_view(), name='token_verify'),
 
-    path('', include('api.urls')),
+    path('', include('services.api.urls')),
 
     # --- ROTAS PARA O SWAGGER ---
     path('schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -2,7 +2,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
-from api.models import Student, Talk, Presence, Speaker, Gift, StudentGift
+from services.api.models import Talk, Presence, Speaker, StudentGift
+from services.students.models import Student
+from services.gifts.models import Gift
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 

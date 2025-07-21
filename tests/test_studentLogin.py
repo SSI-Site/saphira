@@ -1,11 +1,11 @@
 from rest_framework.test import APITestCase, APIClient
 from rest_framework.views import APIView
 from django.urls import reverse
-from students.models import Student
+from services.students.models import Student
 from rest_framework import status
 
 from unittest.mock import patch
-from students.views import StudentLogin
+from services.students.views import StudentLogin
 
 class StudentLoginViewTest(APITestCase):
     def setUp(self):
