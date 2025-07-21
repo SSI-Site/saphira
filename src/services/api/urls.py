@@ -1,4 +1,5 @@
 from django.urls import path, register_converter
+from django.urls.conf import include
 
 from api import views
 from api.utils import UUIDConverter
@@ -31,6 +32,7 @@ urlpatterns = [
     path('admin/gifts', AdminListCreateGiftsView.as_view(), name='admin-list-create-gifts'),
     path('admin/gifts/<uuid:id>', AdminUpdateDestroyGiftView.as_view(), name='admin-update-destroy-gift'),
     path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
+    path('admin/winners/<uuid:winner_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
     path('admin/winners/students/<uuid:student_id>', AdminRetrieveWinnerByStudentView.as_view(), name='admin-retrieve-winner-by-student'),
     path('admin/winners/talks/<int:talk_id>', AdminListCreateWinner.as_view(), name='admin-list-create-winner'),
 
