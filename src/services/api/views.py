@@ -18,6 +18,8 @@ from .serializers import *
 from .utils import *
 from uuid import UUID
 
+from services.gifts.utils import check_and_remove_gifts, check_and_assign_gifts
+
 
 ############################################################################################################
 #                                             PUBLIC VIEWS

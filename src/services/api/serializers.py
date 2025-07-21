@@ -3,7 +3,7 @@ from rest_framework import serializers
 from .models import *
 from .utils import *
 
-from students.models import Student
+from services.students.models import Student
 
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])

@@ -81,9 +81,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'corsheaders',
-    'api',
-    'students',
-    'gifts',
+    'services.api.apps.ApiConfig',
+    'services.students.apps.StudentsConfig',
+    'services.gifts.apps.GiftsConfig',
 ]
 
 REST_FRAMEWORK = {

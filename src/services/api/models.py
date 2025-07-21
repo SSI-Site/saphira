@@ -2,8 +2,8 @@ import uuid
 
 from django.db import models
 
-from students.models import Student
-from gifts.models import Gift
+from services.students.models import Student
+from services.gifts.models import Gift
 
 class Speaker(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
