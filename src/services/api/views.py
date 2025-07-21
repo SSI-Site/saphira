@@ -1,22 +1,13 @@
-from datetime import datetime as dt, timedelta
-from zoneinfo import ZoneInfo
-
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import F
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.utils.decorators import method_decorator
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .decorators import *
-from .models import *
 from .serializers import *
 from .utils import *
-from uuid import UUID
 
 
 ############################################################################################################
