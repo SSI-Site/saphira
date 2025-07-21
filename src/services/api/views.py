@@ -1,6 +1,7 @@
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
+from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from django.http import Http404
@@ -422,19 +423,19 @@ class AdminListCreateWinner(generics.ListCreateAPIView):
             'talk': draw_winner.talk_id,
         }, status=status.HTTP_201_CREATED)
 
-
 @method_decorator(admin_auth_required, name='dispatch')
-class AdminRetrieveWinnerByStudentView (generics.RetrieveAPIView):
-    lookup_field = 'student_id'
+class AdminRetrieveWinnerByStudentView(generics.RetrieveAPIView):
+    serializer_class = DrawWinnerSerializer
+    lookup_url_kwarg = 'student_id'
 
     def get_queryset(self):
         return DrawWinner.objects.all()
 
     def get(self, request, *args, **kwargs):
-        student_id = self.kwargs.get(self.lookup_field)
-        winners = self.get_queryset().filter(student_id=student_id).values('id', 'student', 'talk')
+        student_id = self.kwargs.get(self.lookup_url_kwarg)
+        draw_winners = self.get_queryset().filter(student_id=student_id).values('id', 'talk', 'student')
 
-        if not winners.exists():
-            raise Http404('Nenhum sorteio vencido encontrado para este estudante.')
+        if not draw_winners:
+            return Response({'error': f"Não há brindes registrados para alune de id {student_id}."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(list(winners), status=status.HTTP_200_OK)
+        return Response(list(draw_winners))
