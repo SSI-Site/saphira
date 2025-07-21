@@ -1,22 +1,13 @@
-from datetime import datetime as dt, timedelta
-from zoneinfo import ZoneInfo
-
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
-from django.db.models import F
-from django.http import Http404, JsonResponse
+from django.http import Http404
 from django.utils.decorators import method_decorator
-from rest_framework import generics, status
+from rest_framework import generics
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
 
 from .decorators import *
-from .models import *
 from .serializers import *
 from .utils import *
-from uuid import UUID
 
 from services.gifts.utils import check_and_remove_gifts, check_and_assign_gifts
 
@@ -312,3 +303,43 @@ class AdminDestroyWinnerView(generics.DestroyAPIView):
         obj.delete()
 
         return Response({'message': 'Vencedor removido com sucesso.'}, status=status.HTTP_200_OK)
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminListCreateWinner(generics.ListCreateAPIView):
+    serializer_class = DrawWinnerSerializer
+    queryset = DrawWinner.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        talk_id = self.kwargs.get('talk_id')
+
+        talk = Talk.objects.filter(id=talk_id).first()
+        if not talk:
+            return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
+
+        draw_winners = DrawWinner.objects.filter(talk=talk_id).values('id', 'talk', 'student')
+        return Response(list(draw_winners))
+
+    def post(self, request, *args, **kwargs):
+        talk_id = self.kwargs.get('talk_id')
+
+        talk = Talk.objects.filter(id=talk_id).first()
+        if not talk:
+            return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
+
+        student_id = request.data.get('student')
+        student = Student.objects.filter(id=student_id).first()
+        if not student:
+            return Response({'error': f"Alune com id {student_id} não encontrade."}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not Presence.objects.filter(student=student_id, talk=talk_id).exists():
+            return Response({'error': 'Alune com presença não registrada nessa palestra.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if DrawWinner.objects.filter(student=student, talk=talk_id).exists():
+            return Response({'error': 'Alune já recebeu brinde nessa palestra.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        draw_winner = DrawWinner.objects.create(talk=talk, student=student)
+        return Response({
+            'id': draw_winner.id,
+            'student': draw_winner.student_id,
+            'talk': draw_winner.talk_id,
+        }, status=status.HTTP_201_CREATED)

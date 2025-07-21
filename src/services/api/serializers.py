@@ -85,6 +85,20 @@ class SpeakerSerializer(serializers.ModelSerializer):
         speaker = Speaker.objects.create(**validated_data)
         return speaker
 
+
+class DrawWinnerSerializer(serializers.ModelSerializer):
+    student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
+    talk = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = DrawWinner
+        fields = ['id', 'talk', 'student']
+
+    def create(self, validated_data):
+        draw_winner = DrawWinner.objects.create(**validated_data)
+        return draw_winner
+
+
 class AdminSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True, write_only=True, style={'input_type': 'password'})
