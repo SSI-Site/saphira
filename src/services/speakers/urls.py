@@ -1,6 +1,5 @@
 from django.urls import path
-from . import views
-from views import *
+from .views import *
 
 speakers_urls = [
     path('', RetrieveSpeakersView.as_view(), name='list-speakers'),
@@ -19,6 +18,4 @@ admin_speaker_urls = [
          name='admin-update-destroy-speaker'),
 ]
 
-urlpatterns = [
-    speakers_urls
-]
+urlpatterns = speakers_urls

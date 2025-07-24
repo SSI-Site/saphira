@@ -20,7 +20,7 @@ urlpatterns = [
     path('student/', include('services.students.urls')),
     path('gifts/', include('services.gifts.urls')),
     path('speakers/', include('services.speakers.urls')),
-    path('speaker', include(speaker_urls)),
+    path('speaker/', include(speaker_urls)),
 
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
@@ -39,7 +39,7 @@ urlpatterns = [
     path('admin/student/', include(admin_student_urls)),
     path('admin/gifts/', include(admin_gifts_urls)),
     path('admin/speakers/', include(admin_speakers_urls)),
-    path('admin/speakers', include(admin_speaker_urls)),
+    path('admin/speakers/', include(admin_speaker_urls)),
 
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes
