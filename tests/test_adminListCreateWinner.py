@@ -3,8 +3,9 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
-from services.api.models import Speaker, Talk, Presence, DrawWinner
+from services.api.models import Talk, Presence, DrawWinner
 from services.students.models import Student
+from services.speakers.models import Speaker
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 import uuid

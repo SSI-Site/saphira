@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 from datetime import datetime as dt, timedelta
 
-from services.api.models import Presence, Talk, Speaker
+from services.api.models import Presence, Talk
+from services.speakers.models import Speaker
 from services.students.models import Student
 
 class AdminDrawOnTalkTestCase(APITestCase):
