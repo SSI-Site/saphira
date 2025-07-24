@@ -76,16 +76,6 @@ class CreatePresenceSerializer(serializers.ModelSerializer):
         presence = Presence.objects.create(student=student, talk=talk, **validated_data)
         return presence
 
-class SpeakerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Speaker
-        fields = ['id', 'name', 'description', 'social_media', 'pronouns', 'role']
-
-    def create(self, validated_data):
-        speaker = Speaker.objects.create(**validated_data)
-        return speaker
-
-
 class DrawWinnerSerializer(serializers.ModelSerializer):
     student = serializers.PrimaryKeyRelatedField(queryset=Student.objects.all())
     talk = serializers.PrimaryKeyRelatedField(read_only=True)
