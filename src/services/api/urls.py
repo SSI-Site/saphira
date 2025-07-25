@@ -29,18 +29,13 @@ urlpatterns = [
     path('admin/tokens', AdminListCreateTokensView.as_view(), name='admin-list-create-tokens'),
     path('admin/presences', AdminListCreatePresenceView.as_view(), name='admin-list-create-presence'),
     path('admin/presence/<talk_id>/<student_document>', AdminDestroyPresenceView.as_view(), name='admin-destroy-presence'),
-    path('admin/<talk_id>/draw', AdminDrawOnTalkView.as_view(), name='admin-draw-on-talk'),
-    path('admin/winners', AdminListWinnerView.as_view(), name='admin-list-draw-winners'),
-    path('admin/winners/<uuid:winner_id>', AdminDestroyWinnerView.as_view(), name='admin-destroy-winner'),
-    path('admin/winners/students/<uuid:student_id>', AdminRetrieveWinnerByStudentView.as_view(), name='admin-retrieve-winner-by-student'),
-    path('admin/winners/talks/<int:talk_id>', AdminListCreateWinner.as_view(), name='admin-list-create-winner'),
 
     path('admin/students/', include(admin_students_urls)),
     path('admin/student/', include(admin_student_urls)),
     path('admin/gifts/', include(admin_gifts_urls)),
     path('admin/speakers/', include(admin_speakers_urls)),
     path('admin/speakers/', include(admin_speaker_urls)),
-
+    path('admin/winners/', include('services.winners.urls')),
     # path('admin/attendance-report', AdminAttendanceReportView.as_view(), name='admin-attendance-report'),
     # TODO: fazer tudo relacionado aos brindes
 ]

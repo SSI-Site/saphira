@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
-from services.api.models import DrawWinner, Talk
+from services.api.models import Talk
+from services.winners.models import DrawWinner
 from services.students.models import Student
 from services.speakers.models import Speaker
 from datetime import datetime as dt, timedelta
@@ -38,7 +39,7 @@ class AdminDestroyWinnerViewTestCase(APITestCase):
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
-        
+
         winner = DrawWinner.objects.create(
             student=student,
             talk=talk

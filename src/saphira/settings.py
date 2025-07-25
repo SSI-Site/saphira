@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'services.students.apps.StudentsConfig',
     'services.gifts.apps.GiftsConfig',
     'services.speakers.apps.SpeakersConfig',
+    'services.winners.apps.WinnersConfig',
 ]
 
 REST_FRAMEWORK = {

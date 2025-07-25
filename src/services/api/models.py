@@ -51,14 +51,3 @@ class StudentGift(models.Model):
 
     def __str__(self) -> str:
         return f"StudentGift: {self.student} - {self.gift}, recebido = {self.received}"
-
-class DrawWinner(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    talk = models.ForeignKey(Talk, on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ('student', 'talk',)
-
-    def __str__(self) -> str:
-        return f"Winner: {self.student} na palestra '{self.talk}'"
