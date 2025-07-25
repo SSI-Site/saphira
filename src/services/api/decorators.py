@@ -7,8 +7,6 @@ import jwt
 from django.conf import settings
 from django.http import JsonResponse
 from firebase_admin import auth
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
 if not firebase_admin._apps:
@@ -29,7 +27,7 @@ def firebase_auth_required(view_func):
 
                 body = json.loads(request.body)
                 email = body.get('email')
-                
+
                 if str(token_email) != str(email):
                     return JsonResponse({'error': 'Unauthorized access.'}, status=403)
 
