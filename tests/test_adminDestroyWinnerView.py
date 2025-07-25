@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
-from services.api.models import DrawWinner, Speaker, Talk
+from services.api.models import DrawWinner, Talk
 from services.students.models import Student
+from services.speakers.models import Speaker
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from rest_framework.test import APITestCase

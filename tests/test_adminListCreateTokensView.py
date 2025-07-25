@@ -5,7 +5,8 @@ from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from django.urls import reverse
 
-from services.api.models import Talk, Token, Speaker
+from services.api.models import Talk, Token
+from services.speakers.models import Speaker
 from services.api.utils import generate_token_code
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"

@@ -6,7 +6,8 @@ from django.test import TestCase
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
-from services.api.models import Talk, Speaker
+from services.api.models import Talk
+from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
