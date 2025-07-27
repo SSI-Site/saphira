@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 from datetime import datetime as dt, timedelta
 
-from services.api.models import Presence, Talk
+from services.api.models import Presence, Talk, TalkActivityType
 from services.speakers.models import Speaker
 from services.students.models import Student
 
@@ -87,6 +87,19 @@ class AdminDrawOnTalkTestCase(APITestCase):
             'code': student.code,
             'usp_number': student.usp_number,
         })
+
+    def test_talk_with_activity_type_workshop(self):
+        """Testa se uma palestra com tipo 'WORKSHOP' é criada corretamente"""
+        talk = Talk.objects.create(
+            title="Oficina com Neymar",
+            speaker=self.speaker,
+            description="Workshop sobre dribles",
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1),
+            activity_type=TalkActivityType.WORKSHOP
+        )
+
+        self.assertEqual(talk.activity_type, TalkActivityType.WORKSHOP)
 
     # Retorna a url com o talk_id
     def url(self, id: int) -> str:

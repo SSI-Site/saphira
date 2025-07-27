@@ -6,7 +6,7 @@ from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-from services.api.models import Talk
+from services.api.models import Talk, TalkActivityType
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -113,3 +113,32 @@ class AdminListCreateTalksViewTestCase(TestCase):
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['error'], f"Palestrante com id {inexistent_id} não encontrado(a).")
+    
+    def test_create_talk_with_activity_type(self):
+        data = {
+            "title": "Oficina Teste",
+            "speaker": self.speaker.id,
+            "description": "Oficina sobre Django",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+            "activity_type": TalkActivityType.WORKSHOP
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
+        self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.WORKSHOP)
+
+    def test_create_talk_without_activity_type_uses_default(self):
+        data = {
+            "title": "Palestra sem tipo",
+            "speaker": self.speaker.id,
+            "description": "Teste",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
+        self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.PRESENTATION)
