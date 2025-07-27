@@ -37,7 +37,6 @@ class AdminListCreatePresenceViewTestCase(TestCase):
 
         self.talk = Talk.objects.create(
             title='Palestra de Teste',
-            speaker=self.speaker,
             description='Descrição',
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
@@ -83,7 +82,7 @@ class AdminListCreatePresenceViewTestCase(TestCase):
 
     def test_duplicate_presence(self):
         Presence.objects.create(student=self.student, talk=self.talk)
-        
+
         data = {
             "student_document": "12345678",
             "talk": self.talk.id
@@ -126,15 +125,17 @@ class StudentGiftAssignmentAPITestCase(TestCase):
         )
         # Cria palestras
         base_time = dt.now(ZoneInfo('America/Sao_Paulo'))
-        self.talks = [
-            Talk.objects.create(
+        self.talks = []
+        for i in range(3):
+            talk = Talk.objects.create(
                 title=f"Palestra {i}",
-                speaker=self.speaker,
                 description=f"Descrição {i}",
                 start_time=base_time + timedelta(hours=i*2),
                 end_time=base_time + timedelta(hours=i*2+1)
-            ) for i in range(3)
-        ]
+            )
+            talk.speakers.add(self.speaker)
+            self.talks.append(talk)
+
         # Cria brindes
         self.gift1 = Gift.objects.create(
             name="Chaveiro",

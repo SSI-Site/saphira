@@ -34,11 +34,11 @@ class AdminDestroyWinnerViewTestCase(APITestCase):
 
         talk = Talk.objects.create(
             title='Palestra',
-            speaker=speaker,
             description='Descrição',
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(speaker)
 
         winner = DrawWinner.objects.create(
             student=student,

@@ -32,11 +32,11 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         # Cria uma palestra
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         # Cria estudante
         student1 = Student.objects.create(
@@ -81,11 +81,11 @@ class CreateStudentOnlinePresenceViewTestCase(APITestCase):
         # Cria uma palestra
         talk = Talk.objects.create(
             title="Palestra Expirada",
-            speaker=self.speaker,
             description="Palestra com token expirado",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo'))  + timedelta(hours=1),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=2)
         )
+        talk.speakers.add(self.speaker)
 
         # Cria estudante
         student1 = Student.objects.create(

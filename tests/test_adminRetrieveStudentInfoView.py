@@ -33,11 +33,11 @@ class AdminRetrieveStudentInfoViewTestCase(APITestCase):
 
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(speaker)
 
         student1 = Student.objects.create(
             name = "Glauber",

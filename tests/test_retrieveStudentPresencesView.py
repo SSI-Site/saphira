@@ -6,7 +6,6 @@ from zoneinfo import ZoneInfo
 from services.api.models import Talk, Presence
 from services.students.models import Student
 from services.speakers.models import Speaker
-import uuid
 
 class RetrieveStudentPresencesViewTest(APITestCase):
     def setUp(self):
@@ -29,19 +28,19 @@ class RetrieveStudentPresencesViewTest(APITestCase):
 
         self.talk1 = Talk.objects.create(
             title="Palestra 1",
-            speaker=self.speaker,
             description="Descrição 1",
             start_time=base_time,
             end_time=base_time + timedelta(hours=1)
         )
+        self.talk1.speakers.add(self.speaker)
 
         self.talk2 = Talk.objects.create(
             title="Palestra 2",
-            speaker=self.speaker,
             description="Descrição 2",
             start_time=base_time + timedelta(hours=2),  # Garante unicidade
             end_time=base_time + timedelta(hours=3)
         )
+        self.talk2.speakers.add(self.speaker)
 
         Presence.objects.create(student=self.student, talk=self.talk1)
         Presence.objects.create(student=self.student, talk=self.talk2)
@@ -82,7 +81,7 @@ class RetrieveStudentPresencesViewTest(APITestCase):
 
         url = reverse('retrieve-student-presences', kwargs={'student_id': self.student.id})
         response = self.client.get(url)
-        
+
         self.assertIn(response.status_code, [403, 200])
 
     def test_student_with_no_presences_gets_empty_list(self):
@@ -107,5 +106,3 @@ class RetrieveStudentPresencesViewTest(APITestCase):
         url = reverse('retrieve-student-presences', kwargs={'student_id': self.student.id})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 401)
-
-

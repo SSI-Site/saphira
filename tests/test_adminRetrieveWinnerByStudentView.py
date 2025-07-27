@@ -44,19 +44,19 @@ class AdminRetrieveWinnerByStudentViewTestCase(APITestCase):
         datetime_now = dt.now(ZoneInfo('America/Sao_Paulo'))
         talk1 = Talk.objects.create(
             title='Introdução a Machine Learning',
-            speaker=speaker,
             description='Aprenda o que é Machine Learning e quais técnicas aplicar em cada caso',
             start_time=datetime_now.strftime(DATETIME_FORMAT),
             end_time=(datetime_now + timedelta(hours=2)).strftime(DATETIME_FORMAT),
         )
+        talk1.speakers.add(speaker)
 
         talk2 = Talk.objects.create(
             title='Técnica RandomForest',
-            speaker=speaker,
             description='Como aplicar a técnica de RandomForest ao seu projeto de IA',
             start_time=(datetime_now + timedelta(days=1)).strftime(DATETIME_FORMAT),
             end_time=(datetime_now + timedelta(days=1, hours=2)).strftime(DATETIME_FORMAT),
         )
+        talk2.speakers.add(speaker)
 
         _presence1 = Presence.objects.create(
             student=self.student,
