@@ -6,7 +6,7 @@ from django.test import TestCase
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
-from services.talks.models import Talk
+from services.talks.models import Talk, TalkActivityType
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -132,3 +132,32 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
 
         response = self.client.delete(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_talk_activity_type(self):
+        updated_data = {
+            "title": "Palestra com tipo",
+            "speakers": [self.speaker.id],
+            "description": "Descrição com tipo",
+            "start_time": (self.now + timedelta(days=1)).strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(days=1, hours=1)).strftime(DATETIME_FORMAT),
+            "activity_type": "WS"
+        }
+
+        response = self.client.put(self.url, updated_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.talk.refresh_from_db()
+        self.assertEqual(self.talk.activity_type, "WS")
+
+    def test_partial_update_activity_type(self):
+        response = self.client.patch(self.url, {"activity_type": "WS"}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.talk.refresh_from_db()
+        self.assertEqual(self.talk.activity_type, "WS")
+
+    def test_update_invalid_activity_type(self):
+        data = {"activity_type": "INVALID_TYPE"}
+        response = self.client.patch(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("activity_type", response.json())
