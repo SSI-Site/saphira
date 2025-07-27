@@ -1,12 +1,11 @@
 from django.http import Http404
-from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from rest_framework import generics, status
 from django.db import models
 from rest_framework.response import Response
 
 from .models import Gift
-from .serializers import GiftSerializer
+from .serializers import GiftPublicSerializer, GiftSerializer
 from .utils import check_and_remove_gifts_from_gift
 from ..api.decorators import admin_auth_required
 
@@ -15,16 +14,31 @@ from ..api.decorators import admin_auth_required
 ############################################################################################################
 
 class ListRetrieveGiftsView(generics.ListAPIView):
-    serializer_class = GiftSerializer
+    """
+    Lista todos os brindes.
 
-    def get(self, request, *args, **kwargs):
-        queryset = Gift.objects.filter(
-            models.Q(id=request.GET.get('id', None)) |
-            models.Q(name__startswith=request.GET.get('name', ''))
-        )
-        #apenas id, name e min_presence
-        gifts = queryset.values('id', 'name', 'min_presence')
-        return Response(list(gifts), status=status.HTTP_200_OK)
+    Você pode filtrar a lista usando os seguintes parâmetros na URL:
+    - `id`: Filtra por um ID exato. Ex: /gifts/?id=1
+    - `name`: Filtra por brindes cujo nome começa com o texto. Ex: /api/gifts/?name=Can
+    """
+    serializer_class = GiftPublicSerializer
+
+    def get_queryset(self):
+        """
+        Este método constrói a lista de objetos dinamicamente.
+        """
+        queryset = Gift.objects.all()
+
+        gift_id = self.request.query_params.get('id')
+        name_query = self.request.query_params.get('name')
+
+        if gift_id:
+            queryset = queryset.filter(id=gift_id)
+
+        if name_query:
+            queryset = queryset.filter(name__startswith=name_query)
+
+        return queryset
 
 ############################################################################################################
 #                                               ADMIN VIEWS
@@ -32,6 +46,7 @@ class ListRetrieveGiftsView(generics.ListAPIView):
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateGiftsView(generics.ListCreateAPIView):
+    serializer_class = GiftPublicSerializer
     def post(self, request, *args, **kwargs):
         serializer = GiftSerializer(data=request.data)
 
@@ -43,13 +58,22 @@ class AdminListCreateGiftsView(generics.ListCreateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get(self, request, *args, **kwargs):
-        queryset = Gift.objects.filter(
-            models.Q(id=request.GET.get('id')) |
-            models.Q(name__startswith=request.GET.get('name'))
-        )
-        serializer = GiftSerializer(queryset, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        """
+        Este método constrói a lista de objetos dinamicamente.
+        """
+        queryset = Gift.objects.all()
+
+        gift_id = self.request.query_params.get('id')
+        name_query = self.request.query_params.get('name')
+
+        if gift_id:
+            queryset = queryset.filter(id=gift_id)
+
+        if name_query:
+            queryset = queryset.filter(name__startswith=name_query)
+
+        return queryset
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminUpdateDestroyGiftView(generics.RetrieveUpdateDestroyAPIView):

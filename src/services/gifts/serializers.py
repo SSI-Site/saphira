@@ -16,3 +16,8 @@ class GiftSerializer(serializers.ModelSerializer):
             balance=validated_data.get('total_amount', 0)  # Inicialmente, o saldo é igual ao total
         )
         return gift
+
+class GiftPublicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gift
+        fields = ['id', 'name', 'description', 'min_presence']
