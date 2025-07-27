@@ -1,11 +1,13 @@
 from rest_framework import serializers
 
 from services.api.utils import datetime_url_format
+from services.speakers.models import Speaker
 from .models import Talk
 
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
     end_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
+    speakers = serializers.PrimaryKeyRelatedField(many=True, queryset=Speaker.objects.all())
 
     class Meta:
         model = Talk

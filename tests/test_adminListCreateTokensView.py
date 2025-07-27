@@ -32,10 +32,10 @@ class ListCreateTokenViewTestCase(TestCase):
 
         self.talk = Talk.objects.create(
             title="Teste Palestra",
-            speaker=self.speaker,
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        self.talk.speakers.add(self.speaker)
 
         self.url = reverse('admin-list-create-tokens')
 

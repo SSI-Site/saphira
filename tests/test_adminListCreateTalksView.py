@@ -34,8 +34,8 @@ class AdminListCreateTalksViewTestCase(TestCase):
 
     def test_create_talk(self):
         data = {
-            "title": "Palestra Teste",
-            "speaker": self.speaker.id,
+            "title": "Palestra Existente",
+            "speakers": [self.speaker.id],
             "description": "Descrição",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
@@ -47,13 +47,13 @@ class AdminListCreateTalksViewTestCase(TestCase):
         self.assertIn("talk", response.data)
 
     def test_list_talks(self):
-        Talk.objects.create(
+        talk = Talk.objects.create(
             title="Palestra Existente",
-            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -76,23 +76,23 @@ class AdminListCreateTalksViewTestCase(TestCase):
             "title": "Palestra Inválida",
             "start_time": "2024-13-32T25:70", 
             "end_time": "2024-13-32T26:70", 
-            "speaker": self.speaker.id
+            "speakers": [self.speaker.id]
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
 
     def test_create_duplicate_talk_title_and_start_time(self):
-        Talk.objects.create(
+        talk = Talk.objects.create(
             title="Palestra Existente",
-            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         data = {
             "title": "Palestra Existente",
-            "speaker": self.speaker.id,
+            "speakers": [self.speaker.id],
             "description": "Descrição",
             "start_time": self.now.isoformat(), 
             "end_time": (self.now + timedelta(hours=1)).isoformat()
@@ -104,7 +104,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
         inexistent_id = uuid4()
         data = {
             "title": "Palestra Teste",
-            "speaker": inexistent_id,
+            "speakers": [inexistent_id],
             "description": "Descrição",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
@@ -112,4 +112,4 @@ class AdminListCreateTalksViewTestCase(TestCase):
 
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data['error'], f"Palestrante com id {inexistent_id} não encontrado(a).")
+        self.assertEqual(response.data['error'], f"Palestrantes com ids ['{inexistent_id}'] não encontrados.")

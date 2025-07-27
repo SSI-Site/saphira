@@ -44,11 +44,11 @@ class AdminDrawOnTalkTestCase(APITestCase):
         """Testa o endpoint com uma palestra valida mas sem presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         self.client.force_login(user=self.admin)
         response: Response = self.client.get(self.url(talk.id), format="json")
@@ -60,11 +60,11 @@ class AdminDrawOnTalkTestCase(APITestCase):
         """Testa o endpoint com uma palestra valida mas com presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         student = Student.objects.create(
             name = "Glauber",

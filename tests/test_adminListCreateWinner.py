@@ -45,11 +45,11 @@ class AdminListCreateWinnerTestCase(APITestCase):
         self.talk = Talk.objects.create(
             id=1,
             title='Introdução a Machine Learning',
-            speaker=self.speaker,
             description='Aprenda o que é Machine Learning e quais técnicas aplicar em cada caso',
             start_time=datetime_now.strftime(DATETIME_FORMAT),
             end_time=(datetime_now + timedelta(hours=2)).strftime(DATETIME_FORMAT),
         )
+        self.talk.speakers.add(self.speaker)
 
         self.url = reverse('admin-list-create-winner', kwargs={'talk_id': self.talk.id})
 

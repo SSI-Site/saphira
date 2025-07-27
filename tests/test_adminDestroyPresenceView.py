@@ -37,11 +37,11 @@ class AdminDestroyPresenceViewTestCase(TestCase):
 
         self.talk = Talk.objects.create(
             title='Palestra',
-            speaker=self.speaker,
             description='Descrição',
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        self.talk.speakers.add(self.speaker)
 
         self.presence = Presence.objects.create(student=self.student, talk=self.talk)
 
