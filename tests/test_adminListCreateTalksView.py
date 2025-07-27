@@ -6,7 +6,7 @@ from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-from services.api.models import Talk
+from services.talks.models import Talk
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"

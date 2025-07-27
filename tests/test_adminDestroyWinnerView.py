@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
-from services.api.models import Talk
+from services.talks.models import Talk
 from services.winners.models import DrawWinner
 from services.students.models import Student
 from services.speakers.models import Speaker
