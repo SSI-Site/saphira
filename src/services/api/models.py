@@ -28,17 +28,3 @@ class Presence(models.Model):
 
     def __str__(self) -> str:
         return f"Presence: {self.student} na palestra '{self.talk}'"
-
-class StudentGift(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    gift = models.ForeignKey(Gift, on_delete=models.CASCADE)
-    received = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('student', 'gift',)
-
-    def __str__(self) -> str:
-        return f"StudentGift: {self.student} - {self.gift}, recebido = {self.received}"

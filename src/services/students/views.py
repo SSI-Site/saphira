@@ -15,8 +15,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from services.api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
 from services.api.models import Presence, Token
 from services.api.serializers import OnlinePresenceSerializer
-from .serializers import StudentSerializer
-from .models import Student
+from .serializers import StudentSerializer, StudentGiftSerializer
+from .models import Student, StudentGift
+
 
 # Create your views here.
 
@@ -193,6 +194,31 @@ class RetrieveStudentPresencesView(generics.ListAPIView):
             for p in queryset
         ]
         return Response(presence_list)
+
+@method_decorator(student_auth_required, name='dispatch')
+class ListRetrieveStudentGiftsView(generics.ListAPIView):
+    """
+    Lista todos os brindes associados ao usuário logado
+
+    Você pode filtrar a lista usando os seguintes parâmetros na URL:
+    - `received`: Filtra por status de recebimento. Ex: /student/gifts/?received=true
+    - `gift_name`: Filtra por nome do gift. Ex: /student/gifts/?gift_name=Can    """
+    serializer_class = StudentGiftSerializer
+
+    def get_queryset(self):
+        student = self.request.user
+        queryset = StudentGift.objects.filter(student=student)
+
+        received = self.request.query_params.get('received')
+        if received is not None:
+            received_bool = received.lower() == 'true'
+            queryset = queryset.filter(received=received_bool)
+
+        gift_name = self.request.query_params.get('gift_name')
+        if gift_name:
+            queryset = queryset.filter(gift__name__icontains=gift_name)
+
+        return queryset
 
 ############################################################################################################
 #                                               ADMIN VIEWS

@@ -1,6 +1,6 @@
-from services.api.models import StudentGift, Presence
+from services.api.models import Presence
 from .models import Gift
-from ..students.models import Student
+from ..students.models import Student, StudentGift
 
 def update_gift_balance (gift):
     # Obtém o número de alunos que possuem esse Gift
