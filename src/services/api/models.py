@@ -5,6 +5,7 @@ from django.db import models
 from services.students.models import Student
 from services.gifts.models import Gift
 from services.talks.models import Talk
+from services.speakers.models import Speaker
 
 
 class Token(models.Model):
