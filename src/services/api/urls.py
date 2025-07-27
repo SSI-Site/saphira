@@ -25,13 +25,12 @@ urlpatterns = [
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
     path('admin/tokens', AdminListCreateTokensView.as_view(), name='admin-list-create-tokens'),
-    path('admin/presences', AdminListCreatePresenceView.as_view(), name='admin-list-create-presence'),
-    path('admin/presence/<talk_id>/<student_document>', AdminDestroyPresenceView.as_view(), name='admin-destroy-presence'),
 
     path('admin/students/', include(admin_students_urls)),
     path('admin/student/', include(admin_student_urls)),
     path('admin/gifts/', include(admin_gifts_urls)),
     path('admin/talks/', include('services.talks.urls')),
+    path('admin/presences', include('services.presences.urls')),
     path('admin/speakers/', include(admin_speakers_urls)),
     path('admin/speakers/', include(admin_speaker_urls)),
     path('admin/winners/', include('services.winners.urls')),
