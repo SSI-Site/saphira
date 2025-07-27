@@ -215,7 +215,7 @@ class ListRetrieveStudentGiftsView(generics.ListAPIView):
             queryset = queryset.filter(received=received_bool)
 
         gift_name = self.request.query_params.get('gift_name')
-        if gift_name is not None:
+        if gift_name:
             queryset = queryset.filter(gift__name__icontains=gift_name)
 
         return queryset
