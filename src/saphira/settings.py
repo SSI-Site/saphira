@@ -87,6 +87,7 @@ INSTALLED_APPS = [
     'services.speakers.apps.SpeakersConfig',
     'services.winners.apps.WinnersConfig',
     'services.talks.apps.TalksConfig',
+    'services.presences.apps.PresencesConfig',
 ]
 
 REST_FRAMEWORK = {
