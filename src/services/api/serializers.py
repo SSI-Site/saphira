@@ -8,6 +8,7 @@ from services.students.models import Student
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
     end_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
+    activity_type = serializers.ChoiceField(choices=TalkActivityType.choices, default=TalkActivityType.PRESENTATION)
 
     class Meta:
         model = Talk
