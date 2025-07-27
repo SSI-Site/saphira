@@ -1,5 +1,4 @@
-from services.api.models import StudentGift
-from services.students.models import Student
+from services.students.models import Student, StudentGift
 from services.gifts.models import Gift
 from django.test import TestCase
 from services.gifts.utils import update_gift_balance
