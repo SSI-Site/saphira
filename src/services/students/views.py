@@ -15,8 +15,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from services.api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
 from services.api.models import Presence, Token
 from services.api.serializers import OnlinePresenceSerializer
-from .serializers import StudentSerializer
-from .models import Student
+from .serializers import StudentSerializer, StudentGiftSerializer
+from .models import Student, StudentGift
+
 
 # Create your views here.
 
@@ -193,6 +194,14 @@ class RetrieveStudentPresencesView(generics.ListAPIView):
             for p in queryset
         ]
         return Response(presence_list)
+
+@method_decorator(student_auth_required, name='dispatch')
+class ListRetrieveStudentGiftsView(generics.ListAPIView):
+    serializer_class = StudentGiftSerializer
+
+    def get_queryset(self):
+        student = self.request.user
+        return StudentGift.objects.filter(student=student)
 
 ############################################################################################################
 #                                               ADMIN VIEWS
