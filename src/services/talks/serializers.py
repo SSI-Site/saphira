@@ -2,12 +2,13 @@ from rest_framework import serializers
 
 from services.api.utils import datetime_url_format
 from services.speakers.models import Speaker
-from .models import Talk, TalkActivityType, Sponsor
+from .models import Talk, TalkActivityType, Sponsor, SponsorType
 
 class SponsorSerializer(serializers.ModelSerializer):
+    sponsor_type = serializers.ChoiceField(choices=SponsorType.choices, default=SponsorType.SPONSOR)
     class Meta:
         model = Sponsor
-        fields = ['id', 'name', 'url']
+        fields = ['id', 'name', 'url', 'sponsor_type']
 
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
