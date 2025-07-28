@@ -4,7 +4,8 @@ from .views import (
     AdminListCreateTalksView,
     AdminRetrieveUpdateDestroyTalkView,
     AdminListCreateSponsorView,
-    AdminRetrieveUpdateDestroySponsorView
+    AdminRetrieveUpdateDestroySponsorView,
+    ListRetrieveTalksView
 )
 
 talks_urls = [
