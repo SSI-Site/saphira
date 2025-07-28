@@ -18,7 +18,7 @@ admin_students_urls = [
 
 admin_student_urls = [
     path('<student_document>', views.AdminRetrieveStudentInfoView.as_view(), name='admin-retrieve-student-info'),
-    path('{uuid:student_id}/gifts', views.AdminListRetrieveStudentGiftsByStudentView.as_view(), name='admin-list-retrieve-student-gifts'),
+    path('<uuid:student_id>/gifts', views.AdminListRetrieveStudentGiftsByStudentView.as_view(), name='admin-list-retrieve-student-gifts'),
 ]
 
 urlpatterns = student_urls
