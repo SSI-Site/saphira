@@ -4,10 +4,59 @@ from rest_framework.response import Response
 
 from services.api.decorators import admin_auth_required
 from services.speakers.models import Speaker
-from .models import Talk
-from .serializers import TalkSerializer
+from .models import Talk, Sponsor
+from .serializers import TalkSerializer, SponsorSerializer
 
 # Create your views here.
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminListCreateSponsorView(generics.ListCreateAPIView):
+    queryset = Sponsor.objects.all()
+    serializer_class = SponsorSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            self.perform_create(serializer)
+            return Response(
+                {"message": "Sponsor criado com sucesso.", "sponsor": serializer.data},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminRetrieveUpdateDestroySponsorView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Sponsor.objects.all()
+    serializer_class = SponsorSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response(
+                {"message": "Sponsor atualizado com sucesso.", "sponsor": serializer.data},
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        sponsor = self.get_object()
+
+        if sponsor.talks.exists():
+            return Response(
+                {"error": "Este sponsor está associado a uma ou mais palestras e não pode ser removido."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        sponsor.delete()
+        return Response(
+            {"message": "Sponsor removido com sucesso."},
+            status=status.HTTP_200_OK
+        )
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateTalksView(generics.ListCreateAPIView):
