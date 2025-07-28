@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from django.urls import reverse
-from services.api.models import Talk, Presence
+from services.talks.models import Talk
+from services.presences.models import Presence
 from services.speakers.models import Speaker
 from services.students.models import Student, StudentGift
 from services.gifts.models import Gift

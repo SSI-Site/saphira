@@ -6,7 +6,7 @@ from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-from services.api.models import Talk
+from services.talks.models import Talk, TalkActivityType, Sponsor
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -113,3 +113,71 @@ class AdminListCreateTalksViewTestCase(TestCase):
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['error'], f"Palestrantes com ids ['{inexistent_id}'] não encontrados.")
+
+    def test_create_talk_with_activity_type(self):
+        data = {
+            "title": "Oficina Teste",
+            "speakers": [self.speaker.id],
+            "description": "Oficina sobre Django",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+            "activity_type": "WS"
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["talk"]["activity_type"], "WS")
+
+    def test_create_talk_without_activity_type_uses_default(self):
+        data = {
+            "title": "Palestra sem tipo",
+            "speakers": [self.speaker.id],
+            "description": "Teste",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.PRESENTATION)
+
+    def test_create_talk_with_sponsor(self):
+        sponsor = Sponsor.objects.create(
+            name="OpenAI",
+            url="https://openai.com"
+        )
+
+        data = {
+            "title": "Palestra com Sponsor",
+            "speakers": [self.speaker.id],
+            "description": "Talk patrocinada",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+            "sponsor_id": sponsor.id
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
+        self.assertIn("talk", response.data)
+        self.assertIsNotNone(response.data["talk"]["sponsor"])
+        self.assertEqual(response.data["talk"]["sponsor"]["id"], sponsor.id)
+        self.assertEqual(response.data["talk"]["sponsor"]["name"], sponsor.name)
+        self.assertEqual(response.data["talk"]["sponsor"]["url"], sponsor.url)
+    
+    def test_create_talk_without_sponsor(self):
+        data = {
+            "title": "Palestra sem Sponsor",
+            "speakers": [self.speaker.id],
+            "description": "Sem patrocinador",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
+        self.assertIn("talk", response.data)
+        self.assertIsNone(response.data["talk"]["sponsor"])

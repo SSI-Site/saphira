@@ -3,7 +3,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.urls import reverse
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
-from services.api.models import Talk, Presence
+from services.talks.models import Talk
+from services.presences.models import Presence
 from services.students.models import Student
 from services.speakers.models import Speaker
 
