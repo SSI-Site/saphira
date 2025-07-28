@@ -1,12 +1,13 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
+from rest_framework import status
 from django.urls import reverse
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-from services.talks.models import Talk, TalkActivityType, Sponsor
+from services.talks.models import Talk, TalkActivityType, Sponsor, SponsorType
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -42,7 +43,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
         }
 
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
         self.assertIn("talk", response.data)
 
@@ -56,7 +57,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
         talk.speakers.add(self.speaker)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["title"], "Palestra Existente")
 
@@ -64,12 +65,12 @@ class AdminListCreateTalksViewTestCase(TestCase):
         user = User.objects.create_user(username="user", password="password123")
         self.client.login(username="user", password="password123")
         response = self.client.post(self.url, {})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unauthenticated_user_cant_access(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_talk_invalid_datetime_format(self):
         data = {
@@ -79,7 +80,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
             "speakers": [self.speaker.id]
         }
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_duplicate_talk_title_and_start_time(self):
         talk = Talk.objects.create(
@@ -98,7 +99,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
             "end_time": (self.now + timedelta(hours=1)).isoformat()
         }
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_inexistent_speaker_exception(self):
         inexistent_id = uuid4()
@@ -111,7 +112,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
         }
 
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], f"Palestrantes com ids ['{inexistent_id}'] não encontrados.")
 
     def test_create_talk_with_activity_type(self):
@@ -121,12 +122,12 @@ class AdminListCreateTalksViewTestCase(TestCase):
             "description": "Oficina sobre Django",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
-            "activity_type": "WS"
+            "activity_type": TalkActivityType.WORKSHOP
         }
 
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["talk"]["activity_type"], "WS")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.WORKSHOP)
 
     def test_create_talk_without_activity_type_uses_default(self):
         data = {
@@ -138,13 +139,14 @@ class AdminListCreateTalksViewTestCase(TestCase):
         }
 
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.PRESENTATION)
 
     def test_create_talk_with_sponsor(self):
         sponsor = Sponsor.objects.create(
             name="OpenAI",
-            url="https://openai.com"
+            url="https://openai.com",
+            sponsor_type=SponsorType.PARTNER
         )
 
         data = {
@@ -158,13 +160,14 @@ class AdminListCreateTalksViewTestCase(TestCase):
 
         response = self.client.post(self.url, data, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
         self.assertIn("talk", response.data)
-        self.assertIsNotNone(response.data["talk"]["sponsor"])
-        self.assertEqual(response.data["talk"]["sponsor"]["id"], sponsor.id)
-        self.assertEqual(response.data["talk"]["sponsor"]["name"], sponsor.name)
-        self.assertEqual(response.data["talk"]["sponsor"]["url"], sponsor.url)
+        sponsor_data = response.data["talk"]["sponsor"]
+        self.assertEqual(sponsor_data["id"], sponsor.id)
+        self.assertEqual(sponsor_data["name"], sponsor.name)
+        self.assertEqual(sponsor_data["url"], sponsor.url)
+        self.assertEqual(sponsor_data["sponsor_type"], SponsorType.PARTNER)
     
     def test_create_talk_without_sponsor(self):
         data = {
@@ -177,7 +180,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
 
         response = self.client.post(self.url, data, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
         self.assertIn("talk", response.data)
         self.assertIsNone(response.data["talk"]["sponsor"])
