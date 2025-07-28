@@ -15,7 +15,7 @@ class TalkSerializer(serializers.ModelSerializer):
     speakers = serializers.PrimaryKeyRelatedField(many=True, queryset=Speaker.objects.all())
     activity_type = serializers.ChoiceField(choices=TalkActivityType.choices, default=TalkActivityType.PRESENTATION)
     sponsor = SponsorSerializer(read_only=True)
-    sponsor_id = serializers.PrimaryKeyRelatedField(queryset=Sponsor.objects.all(), write_only=True, source='sponsor', required=False)
+    sponsor_id = serializers.PrimaryKeyRelatedField(queryset=Sponsor.objects.all(), write_only=True, source='sponsor', required=False, allow_null=True)
 
     class Meta:
         model = Talk

@@ -6,7 +6,7 @@ from django.test import TestCase
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 
-from services.talks.models import Talk, TalkActivityType
+from services.talks.models import Talk, TalkActivityType, Sponsor
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -161,3 +161,93 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
         response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("activity_type", response.json())
+
+    def test_retrieve_talk_with_sponsor(self):
+        sponsor = Sponsor.objects.create(name="Microsoft", url="https://microsoft.com")
+        self.talk.sponsor = sponsor
+        self.talk.save()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        data = response.json()
+        self.assertIn("sponsor", data)
+        self.assertIsNotNone(data["sponsor"])
+        self.assertEqual(data["sponsor"]["id"], sponsor.id)
+        self.assertEqual(data["sponsor"]["name"], sponsor.name)
+
+    def test_update_talk_with_sponsor(self):
+        sponsor = Sponsor.objects.create(name="Google", url="https://google.com")
+
+        updated_data = {
+            "title": "Talk com Patrocínio",
+            "speakers": [self.speaker.id],
+            "description": "Nova descrição",
+            "start_time": (self.now + timedelta(days=3)).strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(days=3, hours=1)).strftime(DATETIME_FORMAT),
+            "sponsor_id": sponsor.id
+        }
+
+        response = self.client.put(self.url, updated_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.talk.refresh_from_db()
+        self.assertEqual(self.talk.sponsor.id, sponsor.id)
+
+    def test_partial_update_sponsor(self):
+        sponsor = Sponsor.objects.create(name="AWS", url="https://aws.amazon.com")
+
+        response = self.client.patch(self.url, {"sponsor_id": sponsor.id}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.talk.refresh_from_db()
+        self.assertEqual(self.talk.sponsor.id, sponsor.id)
+
+    def test_partial_remove_sponsor(self):
+        sponsor = Sponsor.objects.create(name="IBM", url="https://ibm.com")
+        self.talk.sponsor = sponsor
+        self.talk.save()
+
+        response = self.client.patch(self.url, {"sponsor_id": None}, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.talk.refresh_from_db()
+        self.assertIsNone(self.talk.sponsor)
+
+    def test_update_with_invalid_sponsor(self):
+        invalid_id = 99999
+
+        updated_data = {
+            "title": "Talk inválido",
+            "speakers": [self.speaker.id],
+            "description": "Descrição",
+            "start_time": (self.now + timedelta(days=1)).strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(days=1, hours=1)).strftime(DATETIME_FORMAT),
+            "sponsor_id": invalid_id
+        }
+
+        response = self.client.put(self.url, updated_data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("sponsor_id", response.json())
+
+    def test_sponsor_deletion_sets_null_in_talk(self):
+        sponsor = Sponsor.objects.create(name="ToBeDeleted", url="https://delete.com")
+        self.talk.sponsor = sponsor
+        self.talk.save()
+
+        sponsor.delete()
+
+        self.talk.refresh_from_db()
+        self.assertIsNone(self.talk.sponsor)
+
+    def test_retrieve_after_sponsor_removal(self):
+        sponsor = Sponsor.objects.create(name="IBM", url="https://ibm.com")
+        self.talk.sponsor = sponsor
+        self.talk.save()
+
+        self.talk.sponsor = None
+        self.talk.save()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIsNone(response.json()["sponsor"])
