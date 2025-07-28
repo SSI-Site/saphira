@@ -54,8 +54,7 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      migrations:
-        condition: service_completed_successfully
+      - migrations
     env_file:
       - .env
     profiles:
@@ -72,8 +71,7 @@ services:
     ports:
       - 8000:8000
     depends_on:
-      migrations:
-        condition: service_completed_successfully
+      - migrations
     env_file:
       - .env
     profiles:

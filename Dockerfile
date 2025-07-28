@@ -16,6 +16,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=pyproject.toml,target=pyproject.toml \
     uv sync --locked --no-install-project --no-dev
 
+# Copia a pasta src para app
 COPY src/ /app
 
 #### DEVELOPMENT ####
@@ -32,7 +33,10 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
+CMD ["uv", "run", "manage.py", "runserver"]
+
 #### BUILDER FOR PROD ####
+# Criamos uma nova imagem sem o uv, apenas o python, nosso código e as dependências
 FROM base AS builder
 
 # Agora sim instalamos o projeto
@@ -66,4 +70,4 @@ ENV PATH="/app/.venv/bin:$PATH"
 EXPOSE 8000
 
 # Rodamos em produção
-CMD [ "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "saphira.wsgi:application" ]
+CMD [ "gunicorn", "--bind", "0.0.0.0:8000", "--workers", "3", "saphira.wsgi:application" ]

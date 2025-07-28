@@ -42,26 +42,11 @@ else:
     print('Choose between DEBUG and PRODUCTION')
     exit(1)
 
-if ENV == 'PRODUCTION':
-    ALLOWED_HOSTS = [
-        'semanadesi.com',
-        'www.semanadesi.com',
-        'co-dashboard.semanadesi.com',
-        'www.co-dashboard.semanadesi.com',
-        'saphira.semanadesi.com',
-        'www.saphira.semanadesi.com',
-    ]
-else:
-    ALLOWED_HOSTS = [
-        'localhost',
-        '127.0.0.1',
-        'semanadesi.com',
-        'www.semanadesi.com',
-        'co-dashboard.semanadesi.com',
-        'www.co-dashboard.semanadesi.com',
-        'saphira.semanadesi.com',
-        'www.saphira.semanadesi.com',
-    ]
+# Securiy Warning: only allow safe hosts in production: localhost, 127.0.0.1,
+# ip address of deploy and saphira's domain
+str_allowed_hosts = getenv('SAPHIRA_ALLOWED_HOSTS')
+assert str_allowed_hosts is not None, 'SAPHIRA_ALLOWED_HOSTS is not set'
+ALLOWED_HOSTS = str_allowed_hosts.split(',')
 
 # Application definition
 INSTALLED_APPS = [
