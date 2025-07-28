@@ -4,10 +4,31 @@ from rest_framework.response import Response
 
 from services.api.decorators import admin_auth_required
 from services.speakers.models import Speaker
+
+from .utils import apply_talk_filters
 from .models import Talk, Sponsor
 from .serializers import TalkSerializer, SponsorSerializer
 
-# Create your views here.
+
+
+############################################################################################################
+#                                             PUBLIC VIEWS
+############################################################################################################
+
+class ListRetrieveTalksView(generics.ListAPIView):
+    """
+    Lista todas as palestras
+    A lista é filtrada usando funcao utilitária apply_talk_filters
+    """
+    serializer_class = TalkSerializer
+
+    def get_queryset(self):
+        queryset = Talk.objects.all()
+        return apply_talk_filters(self, queryset)
+
+############################################################################################################
+#                                               ADMIN VIEWS
+############################################################################################################
 
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateSponsorView(generics.ListCreateAPIView):

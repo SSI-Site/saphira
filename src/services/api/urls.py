@@ -8,6 +8,7 @@ from services.api.utils import UUIDConverter
 from services.gifts.urls import admin_gifts_urls
 from services.speakers.urls import admin_speakers_urls, admin_speaker_urls, speaker_urls
 from services.students.urls import admin_students_urls, admin_student_urls
+from services.talks.urls import admin_talks_urls
 
 register_converter(UUIDConverter, 'uuid')
 
@@ -20,6 +21,7 @@ urlpatterns = [
     path('student/', include('services.students.urls')),
     path('gifts/', include('services.gifts.urls')),
     path('speakers/', include('services.speakers.urls')),
+    path('talks/', include('services.talks.urls')),
     path('speaker/', include(speaker_urls)),
 
     # Admin endpoints
@@ -29,7 +31,7 @@ urlpatterns = [
     path('admin/students/', include(admin_students_urls)),
     path('admin/student/', include(admin_student_urls)),
     path('admin/gifts/', include(admin_gifts_urls)),
-    path('admin/talks/', include('services.talks.urls')),
+    path('admin/talks/', include(admin_talks_urls)),
     path('admin/presences', include('services.presences.urls')),
     path('admin/speakers/', include(admin_speakers_urls)),
     path('admin/speakers/', include(admin_speaker_urls)),
