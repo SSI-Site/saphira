@@ -1,4 +1,4 @@
-from services.api.models import Presence
+from services.presences.models import Presence
 from .models import Gift
 from ..students.models import Student, StudentGift
 

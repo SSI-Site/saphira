@@ -63,21 +63,3 @@ class AdminLogoutView(APIView):
 @admin_auth_required
 def admin_index(request):
     return Response({"message": "Credenciais incorretas!! Brincadeirinha...o login deu bom =)"}, status=200)
-
-
-@method_decorator(admin_auth_required, name='dispatch')
-class AdminListCreateTokensView(generics.ListCreateAPIView):
-    queryset = Token.objects.all()
-    serializer_class = TokenSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-
-        if serializer.is_valid():
-            self.perform_create(serializer)
-
-            return Response(
-                {"message": "Token criado com sucesso.", "token": serializer.data},
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
