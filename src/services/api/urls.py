@@ -30,7 +30,7 @@ urlpatterns = [
     path('admin/student/', include(admin_student_urls)),
     path('admin/gifts/', include(admin_gifts_urls)),
     path('admin/talks/', include(admin_talks_urls)),
-    path('admin/presences', include('services.presences.urls')),
+    path('admin/presences/', include('services.presences.urls')),
     path('admin/speakers/', include(admin_speakers_urls)),
     path('admin/speakers/', include(admin_speaker_urls)),
     path('admin/winners/', include('services.winners.urls')),

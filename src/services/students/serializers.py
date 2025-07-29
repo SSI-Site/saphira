@@ -2,6 +2,10 @@ from rest_framework import serializers
 from .models import Student, StudentGift
 from ..gifts.serializers import GiftPublicSerializer
 
+class StudentLoginSerializer(serializers.Serializer):
+    name = serializers.CharField()
+    email = serializers.EmailField()
+
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student

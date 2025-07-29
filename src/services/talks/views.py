@@ -1,4 +1,5 @@
 from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -14,11 +15,15 @@ from .serializers import TalkSerializer, SponsorSerializer
 ############################################################################################################
 #                                             PUBLIC VIEWS
 ############################################################################################################
-
+@extend_schema(tags=['Talks'], summary="List talks")
 class ListRetrieveTalksView(generics.ListAPIView):
     """
     Lista todas as palestras
-    A lista é filtrada usando funcao utilitária apply_talk_filters
+    Você pode filtrar a lista usando os seguintes parâmetros na URL:
+    - `date`: Filtra por data específica. Ex: /talks/?date=2025-07-27T14:30
+    - `start_date`: Filtra talks a partir de uma data. Ex: /talks/?start_date=2025-07-27T00:00
+    - `end_date`: Filtra talks até uma data. Ex: /talks/?end_date=2025-07-30T23:59
+    - `title`: Filtra por título da talk. Ex: /talks/?title=Python
     """
     serializer_class = TalkSerializer
 
@@ -30,12 +35,21 @@ class ListRetrieveTalksView(generics.ListAPIView):
 #                                               ADMIN VIEWS
 ############################################################################################################
 
+@extend_schema(tags=['Sponsors'], summary="List sponsors")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateSponsorView(generics.ListCreateAPIView):
     queryset = Sponsor.objects.all()
     serializer_class = SponsorSerializer
 
+    @extend_schema(tags=['Sponsors'], summary="Create sponsors")
     def create(self, request, *args, **kwargs):
+        """Cria um patrocinador de palestras.
+
+        São necessários os campos:
+        - `name`: Nome do patrocinador
+        - `url_link`: Link para a página do patrocinador
+        - `sponsor_type`: Tipo de patrocinador (Sponsor, Partner)
+        """
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
@@ -46,12 +60,15 @@ class AdminListCreateSponsorView(generics.ListCreateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(tags=['Talks'], summary="Retrieve sponsor")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveUpdateDestroySponsorView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Sponsor.objects.all()
     serializer_class = SponsorSerializer
 
+    @extend_schema(summary="Update sponsor")
     def update(self, request, *args, **kwargs):
+        """Atualiza um patrocinador com base no id"""
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
@@ -64,7 +81,14 @@ class AdminRetrieveUpdateDestroySponsorView(generics.RetrieveUpdateDestroyAPIVie
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(summary="Deletes a sponsor")
     def delete(self, request, *args, **kwargs):
+        """Remove um sponsor.
+
+        **Nota:**
+        Essa rota falha caso existam palestras associadas a esse patrocinador.
+        Remova ou edite essas palestras.
+        """
         sponsor = self.get_object()
 
         if sponsor.talks.exists():
@@ -79,12 +103,22 @@ class AdminRetrieveUpdateDestroySponsorView(generics.RetrieveUpdateDestroyAPIVie
             status=status.HTTP_200_OK
         )
 
+@extend_schema(tags=['Talks'], summary="List sponsor")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateTalksView(generics.ListCreateAPIView):
     queryset = Talk.objects.all()
     serializer_class = TalkSerializer
 
+    @extend_schema(tags=['Talks'], summary="Create talk")
     def create(self, request, *args, **kwargs):
+        """Cria um palestra
+        É necessário definir os campos:
+        - `title`: Título da palestra
+        - `description`: Descrição da palestra
+        - `start_time`: Horário de início da palestra
+        - `end_time`: Horário de fim da palestra
+        - `speakers`: Lista de IDs dos palestrantes
+        """
         serializer = self.get_serializer(data=request.data)
 
         speaker_ids = request.data.get('speakers', [])
@@ -106,12 +140,15 @@ class AdminListCreateTalksView(generics.ListCreateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(tags=['Talks'], summary="Retrieve talk")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveUpdateDestroyTalkView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Talk.objects.all()
     serializer_class = TalkSerializer
 
+    @extend_schema(tags=['Talks'], summary="Delete talk")
     def delete(self, request, *args, **kwargs):
+        """Remover palestra"""
         talk = self.get_object()
         talk.delete()
         return Response({'message': 'Palestra removida com sucesso.'}, status=status.HTTP_200_OK)
