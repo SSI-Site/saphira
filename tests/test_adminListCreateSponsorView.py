@@ -4,9 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 
-from services.talks.models import Sponsor
-
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
+from services.talks.models import Sponsor, SponsorType
 
 class AdminListCreateSponsorViewTestCase(TestCase):
     def setUp(self):
@@ -31,6 +29,7 @@ class AdminListCreateSponsorViewTestCase(TestCase):
         self.assertEqual(response.data["message"], "Sponsor criado com sucesso.")
         self.assertIn("sponsor", response.data)
         self.assertEqual(response.data["sponsor"]["name"], data["name"])
+        self.assertEqual(response.data["sponsor"]["sponsor_type"], SponsorType.SPONSOR)
 
     def test_create_sponsor_invalid_data(self):
         data = {
@@ -52,6 +51,8 @@ class AdminListCreateSponsorViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["sponsor_type"], SponsorType.SPONSOR)
+        self.assertEqual(response.data[1]["sponsor_type"], SponsorType.SPONSOR)
         self.assertEqual(response.data[0]["name"], "Sponsor A")
         self.assertEqual(response.data[1]["name"], "Sponsor B")
 
@@ -71,3 +72,13 @@ class AdminListCreateSponsorViewTestCase(TestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_create_sponsor_invalid_type(self):
+        data = {
+            "name": "Foo",
+            "url": "https://foo.com",
+            "sponsor_type": "XX"
+        }
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("sponsor_type", response.data)
