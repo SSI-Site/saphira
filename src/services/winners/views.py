@@ -4,7 +4,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from services.api.decorators import admin_auth_required
-from services.api.models import Presence, Talk
+from services.presences.models import Presence
+from services.talks.models import Talk
 from services.students.models import Student
 from services.winners.models import DrawWinner
 from services.winners.serializers import DrawWinnerSerializer
