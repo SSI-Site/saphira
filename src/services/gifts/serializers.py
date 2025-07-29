@@ -21,3 +21,9 @@ class GiftPublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gift
         fields = ['id', 'name', 'description', 'min_presence']
+
+
+class GiftPrivateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gift
+        fields = ['id', 'name', 'description', 'min_presence', 'total_amount', 'balance']

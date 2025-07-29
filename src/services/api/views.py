@@ -1,34 +1,40 @@
-from datetime import datetime as dt, timedelta
-from zoneinfo import ZoneInfo
 
-from django.shortcuts import get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
-from django.http import Http404
-from django.utils.decorators import method_decorator
-from rest_framework import generics, status
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .decorators import *
-from .serializers import *
-from .utils import *
+from .decorators import admin_auth_required
+from .serializers import (
+    AdminSerializer,
+    EmptySerializer
+)
 
-from services.gifts.utils import check_and_remove_gifts, check_and_assign_gifts
-
+from drf_spectacular.utils import extend_schema
 
 ############################################################################################################
 #                                             PUBLIC VIEWS
 ############################################################################################################
+@extend_schema(
+    tags=['Public'],
+    summary="Ponto de entrada")
 @api_view(['GET'])
 def index(request):
+    """Ponto de entrada para o Saphira. Seja bem-vindo. Se essa endpoint não estiver funcionando o Saphira está fora do ar."""
     return Response({"message": "Bem-vinde à API Saphira!"}, status=status.HTTP_200_OK)
 
+@extend_schema(
+    tags=['Admin'],
+    summary="Admin login",
+    methods=["POST"]
+)
 class AdminLoginView(APIView):
     serializer_class = AdminSerializer
 
+    @extend_schema(summary="Admin auth")
     def post(self, request, *args, **kwargs):
+        """Autenticação do Administrador"""
         username = request.data.get('username')
         password = request.data.get('password')
 
@@ -40,15 +46,23 @@ class AdminLoginView(APIView):
         else:
             return Response({'detail': 'Você não é da CO-SSI...'}, status=status.HTTP_401_UNAUTHORIZED)
 
+@extend_schema(
+    tags=["Admin"],
+    summary="Admin Logout",
+    methods=["POST"]
+)
 class AdminLogoutView(APIView):
     serializer_class = EmptySerializer
 
+    # Usado pelo drf para mostrar na tela se o admin esta logado
     def get(self, request):
         if not request.user.is_authenticated:
             return Response({'message': 'Você não está logado como admin.'}, status=status.HTTP_401_UNAUTHORIZED)
         return Response({'message': 'Você está logado como admin.'}, status=status.HTTP_200_OK)
 
+    @extend_schema(summary="Admin logout")
     def post(self, request):
+        """Endpoint para deslogar da conta de adminstrador"""
         if not request.user.is_authenticated:
             return Response({'message': 'Você não está logado como admin.'}, status=status.HTTP_401_UNAUTHORIZED)
         logout(request)
@@ -59,7 +73,11 @@ class AdminLogoutView(APIView):
 ############################################################################################################
 #                                               ADMIN VIEWS
 ############################################################################################################
+@extend_schema(
+    tags=["Admin"],
+    summary="Admin index")
 @api_view(['GET'])
 @admin_auth_required
 def admin_index(request):
+    """Ponto de entrada para página de admin"""
     return Response({"message": "Credenciais incorretas!! Brincadeirinha...o login deu bom =)"}, status=200)

@@ -1,5 +1,6 @@
 from django.http import Http404
 from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.response import Response
 
@@ -12,8 +13,10 @@ from services.winners.serializers import DrawWinnerSerializer
 
 # Create your views here.
 
+@extend_schema(tags=['Winners'], summary="Draw a student from talk")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDrawOnTalkView(generics.RetrieveAPIView):
+    """Sorteia um estudante presente na palestra especificada `talk_id`"""
     def get(self, request, *args, **kwargs):
         talk_id = self.kwargs.get('talk_id')
 
@@ -39,8 +42,11 @@ class AdminDrawOnTalkView(generics.RetrieveAPIView):
             'usp_number': student.usp_number,
         })
 
+@extend_schema(tags=['Winners'], summary="List winners")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListWinnerView(generics.ListAPIView):
+    """Lista todos os vencedores/sorteados
+    """
     queryset = DrawWinner.objects.all()
 
     def get(self, request, *args, **kwargs):
@@ -48,8 +54,13 @@ class AdminListWinnerView(generics.ListAPIView):
 
         return Response(list(draw_winners))
 
+@extend_schema(tags=["Winners"], summary="Delete winner")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDestroyWinnerView(generics.DestroyAPIView):
+    """Apaga o registro de sorteio.
+
+    Útil para invalidar um sorteio
+    """
     serializer_class = DrawWinnerSerializer
     lookup_url_kwarg = 'winner_id'
 
@@ -68,6 +79,7 @@ class AdminDestroyWinnerView(generics.DestroyAPIView):
 
         return Response({'message': 'Vencedor removido com sucesso.'}, status=status.HTTP_200_OK)
 
+@extend_schema(tags=["Winners"], summary="List winners")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateWinner(generics.ListCreateAPIView):
     serializer_class = DrawWinnerSerializer
@@ -83,7 +95,12 @@ class AdminListCreateWinner(generics.ListCreateAPIView):
         draw_winners = DrawWinner.objects.filter(talk=talk_id).values('id', 'talk', 'student')
         return Response(list(draw_winners))
 
+    @extend_schema(tags=["Winners"], summary="Create winners")
     def post(self, request, *args, **kwargs):
+        """Cria novos winners.
+
+        Permite criar novos winners.
+        """
         talk_id = self.kwargs.get('talk_id')
 
         talk = Talk.objects.filter(id=talk_id).first()
@@ -108,6 +125,7 @@ class AdminListCreateWinner(generics.ListCreateAPIView):
             'talk': draw_winner.talk.id,
         }, status=status.HTTP_201_CREATED)
 
+@extend_schema(tags=["Winners"], summary="List winners by student")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveWinnerByStudentView(generics.RetrieveAPIView):
     serializer_class = DrawWinnerSerializer
@@ -125,6 +143,7 @@ class AdminRetrieveWinnerByStudentView(generics.RetrieveAPIView):
 
         return Response(list(draw_winners))
 
+@extend_schema(tags=["Winners"], summary="List winners by talk")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveWinnerByTalkView(generics.RetrieveAPIView):
     serializer_class = DrawWinnerSerializer

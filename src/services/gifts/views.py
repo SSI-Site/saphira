@@ -1,11 +1,11 @@
 from django.http import Http404
 from django.utils.decorators import method_decorator
 from rest_framework import generics, status
-from django.db import models
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema
 
 from .models import Gift
-from .serializers import GiftPublicSerializer, GiftSerializer
+from .serializers import GiftPrivateSerializer, GiftPublicSerializer, GiftSerializer
 from .utils import check_and_remove_gifts_from_gift
 from ..api.decorators import admin_auth_required
 
@@ -13,6 +13,9 @@ from ..api.decorators import admin_auth_required
 #                                             PUBLIC VIEWS
 ############################################################################################################
 
+@extend_schema(
+    tags=['Gifts'],
+    summary="List and retrieve gifts")
 class ListRetrieveGiftsView(generics.ListAPIView):
     """
     Lista todos os brindes.
@@ -44,14 +47,40 @@ class ListRetrieveGiftsView(generics.ListAPIView):
 #                                               ADMIN VIEWS
 ############################################################################################################
 
+@extend_schema(
+    tags=['Gifts'],
+    summary='Listagem de brindes',
+    responses={201: GiftPublicSerializer}
+)
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateGiftsView(generics.ListCreateAPIView):
-    serializer_class = GiftPublicSerializer
+    """
+    Listagem de brindes.
+
+    Esse endpoint incluí o `balance` em seu retorno.
+
+    É possível filtrar por brindes da mesma forma que em `/gifts`
+    """
+    serializer_class = GiftPrivateSerializer
+
+    @extend_schema(summary='Criação de brindes')
     def post(self, request, *args, **kwargs):
+        """
+        Criação de brindes.
+
+        Para criar brindes é preciso dos seguintes atributos:
+        - `name`: nome do brinde
+        - `description`: descrição do brinde (material, cores, etc)
+        - `min_presence`: minimo de presença necessária para desbloquear o brinde
+        - `total_amount`: qnt. comprada pela COSSI
+
+        **Nota**:
+        - `balance` é computado automaticamente na criação de um gift e atualizado sempre que um brinde é retirado
+        """
         serializer = GiftSerializer(data=request.data)
 
         if serializer.is_valid():
-            gift = serializer.save()
+            _gift = serializer.save()
             return Response(
                 serializer.data,
                 status=status.HTTP_201_CREATED
@@ -75,6 +104,11 @@ class AdminListCreateGiftsView(generics.ListCreateAPIView):
 
         return queryset
 
+@extend_schema(
+    tags=['Gifts'],
+    summary="Retrieve Gift by uid",
+    request=GiftSerializer,
+)
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminUpdateDestroyGiftView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GiftSerializer
@@ -91,12 +125,20 @@ class AdminUpdateDestroyGiftView(generics.RetrieveUpdateDestroyAPIView):
             raise Http404(f"Gift com id {lookup_value} não encontrado.")
         return gift
 
+    @extend_schema(summary="Delete Gift by uid")
     def delete(self, request, *args, **kwargs):
+        """Apaga um brinde com base no uid"""
         gift = self.get_object()
         gift.delete()
         return Response({'message': f'Gift {gift.name} removido com sucesso.'}, status=status.HTTP_200_OK)
 
+    @extend_schema(summary="Update Gift by uid")
     def put(self, request, *args, **kwargs):
+        """
+        Atualiza campos de um brinde
+
+        Permite atualizar os campos do brinde. É possível alterar todos os campos, exceto `id` e `balance`.
+        """
         gift = self.get_object()
         allowed_fields = ['name', 'description', 'total_amount', 'min_presence']
 

@@ -1,11 +1,10 @@
-from datetime import datetime as dt, timedelta
 import string
 import random
-from zoneinfo import ZoneInfo
 
 from django.db import models
 from django.http import Http404, JsonResponse
 from django.utils.decorators import method_decorator
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -33,9 +32,19 @@ def generate_unique_code(length=3):
 ############################################################################################################
 #                                         FIREBASE REQUIRED VIEWS
 ############################################################################################################
+@extend_schema(
+    summary="Login student",
+    tags=["Students"]
+)
 @method_decorator(firebase_auth_required, name='dispatch')
 class StudentLogin(APIView):
+
     def post(self, request, *args, **kwargs):
+        """Sistema de login do estudante
+
+        Este é um endpoint que funciona através da autenticação do firebase, não o use diretamente.
+        Apenas o chame depois que estiver logado no firebase.
+        """
         data = request.data
 
         required_fields = ['name', 'email']
@@ -86,17 +95,27 @@ class StudentLogin(APIView):
 ############################################################################################################
 #                                             STUDENT VIEWS
 ############################################################################################################
+@extend_schema(
+    tags=["Students"],
+    summary="Index Student"
+)
 @student_auth_required
 @api_view(['GET'])
 def student_index(request):
+    """Ponto de entrada para a área de estudantes"""
     return Response({"message": "Bem-vinde à área exclusiva de estudantes!"}, status=200)
 
+@extend_schema(
+    tags=["Students"],
+    summary="Retrieve student"
+)
 @method_decorator(student_auth_required, name='dispatch')
 class StudentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
     def get(self, request, *args, **kwargs):
+        """Retorna um estudante com base no `id`"""
         student_id = kwargs.get('student_id')
 
         try:
@@ -112,7 +131,12 @@ class StudentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             'usp_number': student.usp_number,
         })
 
+    @extend_schema(summary="Update student")
     def put(self, request, *args, **kwargs):
+        """Atualiza o estudante.
+
+        É possível atualizar os seguintes campos: `usp_number`
+        """
         student_id = kwargs.get('student_id')
 
         try:
@@ -136,8 +160,10 @@ class StudentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             'usp_number': student.usp_number,
         })
 
+@extend_schema(tags=["Students"], summary="Retrieve student's presences")
 @method_decorator(student_auth_required, name='dispatch')
 class RetrieveStudentPresencesView(generics.ListAPIView):
+    """Retorna as presenças que o estudante possui"""
     def get_queryset(self):
         student_id = self.kwargs.get('student_id')
         return Presence.objects.filter(student_id=student_id).select_related('talk')
@@ -154,6 +180,7 @@ class RetrieveStudentPresencesView(generics.ListAPIView):
         ]
         return Response(presence_list)
 
+@extend_schema(tags=["Students"], summary="Retrieve student's gifts")
 @method_decorator(student_auth_required, name='dispatch')
 class ListRetrieveStudentGiftsView(generics.ListAPIView):
     """
@@ -170,16 +197,20 @@ class ListRetrieveStudentGiftsView(generics.ListAPIView):
 ############################################################################################################
 #                                               ADMIN VIEWS
 ############################################################################################################
+@extend_schema(tags=["Students"], summary="List students")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListStudentsView(generics.ListAPIView):
+    """Lista todos os estudantes"""
     queryset = Student.objects.all()
 
     def get(self, request, *args, **kwargs):
         students = self.get_queryset().values('id', 'name', 'code')
         return Response(list(students))
 
+@extend_schema(tags=["Students"], summary="Retrieve student by name")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListStudentsByNameView(generics.ListAPIView):
+    """Retorna todos os estudantes que contenham em seus nomes `name`."""
     queryset = Student.objects.all()
 
     def get(self, request, *args, **kwargs):
@@ -187,8 +218,10 @@ class AdminListStudentsByNameView(generics.ListAPIView):
         students = Student.objects.filter(name__icontains=name).values('id', 'name', 'code', 'email')
         return Response(list(students))
 
+@extend_schema(tags=["Students"], summary="Retrieve student")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
+    """Retorna as informações de um estudante"""
     def get(self, request, *args, **kwargs):
         student_document = self.kwargs.get('student_document')
 
@@ -220,6 +253,7 @@ class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
             'presences': list(presences_with_talk_title)
         })
 
+@extend_schema(tags=["Students"], summary="Delete student")
 @method_decorator(admin_auth_required, name='delete')
 class AdminDestroyStudentView(generics.DestroyAPIView):
     queryset = Student.objects.all()
@@ -241,10 +275,15 @@ class AdminDestroyStudentView(generics.DestroyAPIView):
         return student
 
     def delete(self, request, *args, **kwargs):
+        """Apaga um estudante da base da dados.
+        **Nota:**
+        Isso não apaga o registro do estudante no firebase.
+        """
         student = self.get_object()
         student.delete()
         return Response({'message': f'Estudante {student.name} removido com sucesso.'}, status=status.HTTP_200_OK)
 
+@extend_schema(tags=["Students"], summary="Retrieve student's gifts")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListRetrieveStudentGiftsByStudentView(generics.ListAPIView):
     """
