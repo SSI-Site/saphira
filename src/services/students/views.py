@@ -13,8 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from services.api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
-from services.api.models import Presence, Token
-from services.api.serializers import OnlinePresenceSerializer
+from services.api.models import Presence
 from .serializers import StudentSerializer, StudentGiftSerializer
 from .models import Student, StudentGift
 from .utils import apply_student_gift_filters
@@ -136,47 +135,6 @@ class StudentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
             'code': student.code,
             'usp_number': student.usp_number,
         })
-
-@method_decorator(student_auth_required, name='dispatch')
-class CreateStudentOnlinePresenceView(generics.CreateAPIView):
-    serializer_class = OnlinePresenceSerializer
-    queryset = Presence.objects.all()
-
-    def post(self, request, *args, **kwargs):
-        token_code = request.data.get('token_code')
-        student_id = self.kwargs.get('student_id')
-
-        if not token_code:
-            return Response({'error': 'Token não informado.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        token = Token.objects.filter(code=token_code.upper()).first()
-
-        if not token:
-            return Response({'error': 'Token inválido.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        duration = timedelta(minutes=token.duration)
-
-        now = dt.now(ZoneInfo('America/Sao_Paulo')) # Horário de Brasília
-        begin = token.begin
-        end = begin + duration
-
-        if not (begin <= now <= end):
-            return Response({'error': 'Token expirado.'}, status=status.HTTP_401_UNAUTHORIZED)
-
-        student = Student.objects.filter(id=student_id).first()
-
-        if Presence.objects.filter(student=student, talk=token.talk).exists():
-            return Response({'error': 'Presença já registrada nessa palestra.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        presence = Presence.objects.create(
-            student=student,
-            talk=token.talk,
-        )
-
-        return Response({
-          'student': presence.student.id,
-          'talk': presence.talk.id,
-        }, status=status.HTTP_201_CREATED)
 
 @method_decorator(student_auth_required, name='dispatch')
 class RetrieveStudentPresencesView(generics.ListAPIView):
