@@ -26,8 +26,6 @@ urlpatterns = [
 
     # Admin endpoints
     path('admin', views.admin_index, name='admin-login-test'),
-    path('admin/tokens', AdminListCreateTokensView.as_view(), name='admin-list-create-tokens'),
-
     path('admin/students/', include(admin_students_urls)),
     path('admin/student/', include(admin_student_urls)),
     path('admin/gifts/', include(admin_gifts_urls)),
