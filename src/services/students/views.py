@@ -13,8 +13,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from services.api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
-from services.api.models import Presence, Token
 from services.api.serializers import OnlinePresenceSerializer
+from services.presences.models import Presence
 from .serializers import StudentSerializer, StudentGiftSerializer
 from .models import Student, StudentGift
 from .utils import apply_student_gift_filters

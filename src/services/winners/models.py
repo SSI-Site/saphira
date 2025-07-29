@@ -2,7 +2,7 @@ from django.db import models
 
 import uuid
 
-from services.api.models import Talk
+from services.talks.models import Talk
 from services.students.models import Student
 # Create your models here.
 
