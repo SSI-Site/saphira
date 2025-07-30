@@ -24,7 +24,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install Dependencies
       run: |
-        uv sync --no-dev --locked
+        uv sync --no-dev
     - name: Add secrets.json
       run: |
         echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json

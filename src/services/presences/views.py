@@ -4,6 +4,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 
 from services.api.decorators import admin_auth_required
+from services.api.serializers import EmptySerializer
 from services.gifts.utils import check_and_assign_gifts, check_and_remove_gifts
 from django.db import models
 from services.presences.models import Presence
@@ -11,15 +12,26 @@ from services.presences.serializers import CreatePresenceSerializer
 from services.students.models import Student
 from services.talks.models import Talk
 
+from drf_spectacular.utils import extend_schema
 # Create your views here.
+
+@extend_schema(
+    tags=["Presences"],
+    summary="List presences")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreatePresenceView(generics.ListCreateAPIView):
-    """Registro e recuperação de presenças"""
+    """Listagem de presenças"""
     queryset = Presence.objects.all()
     serializer_class = CreatePresenceSerializer
 
+    @extend_schema(
+        tags=["Presences"],
+        summary="Create presence")
     def post(self, request, *args, **kwargs):
-        """Registrar novas presenças"""
+        """Registrar novas presenças
+
+        É necessário o `id` do estudante e o `id` da palestra
+        """
         serializer = self.get_serializer(data=request.data)
 
         if serializer.is_valid():
@@ -33,9 +45,18 @@ class AdminListCreatePresenceView(generics.ListCreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(
+    tags=["Presences"],
+    summary="Remove presence")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDestroyPresenceView(generics.DestroyAPIView):
-    """Remoção de presenças"""
+    """Remoção de presenças
+
+    Para remover uma presença é preciso do id da palestra, e o documento do estudante.
+    O documento pode ser o _email_, _código_ ou _número usp_.
+    """
+
+    serializer_class = EmptySerializer
     queryset = Presence.objects.all()
 
     def get_object(self):

@@ -88,7 +88,7 @@ proto-plus==1.24.0
     # via
     #   google-api-core
     #   google-cloud-firestore
-protobuf==5.27.3
+protobuf==5.29.5
     # via
     #   google-api-core
     #   google-cloud-firestore

@@ -5,10 +5,9 @@ from services.speakers.models import Speaker
 from .models import Talk, TalkActivityType, Sponsor, SponsorType, TalkModeType
 
 class SponsorSerializer(serializers.ModelSerializer):
-    sponsor_type = serializers.ChoiceField(choices=SponsorType.choices, default=SponsorType.SPONSOR)
     class Meta:
         model = Sponsor
-        fields = ['id', 'name', 'url', 'sponsor_type']
+        fields = ['id', 'name', 'url']
 
 class TalkSerializer(serializers.ModelSerializer):
     start_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
