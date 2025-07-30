@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from services.api.utils import datetime_url_format
 from services.speakers.models import Speaker
-from .models import Talk, TalkActivityType, Sponsor, SponsorType, TalkModeType
+from .models import Talk, TalkActivityType, Sponsor, TalkModeType
 
 class SponsorSerializer(serializers.ModelSerializer):
     class Meta:
