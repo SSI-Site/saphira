@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from services.api.utils import datetime_url_format
 from services.speakers.models import Speaker
-from .models import Talk, TalkActivityType, Sponsor, SponsorType
+from .models import Talk, TalkActivityType, Sponsor, SponsorType, TalkModeType
 
 class SponsorSerializer(serializers.ModelSerializer):
     sponsor_type = serializers.ChoiceField(choices=SponsorType.choices, default=SponsorType.SPONSOR)
@@ -15,6 +15,7 @@ class TalkSerializer(serializers.ModelSerializer):
     end_time = serializers.DateTimeField(format=datetime_url_format, input_formats=[datetime_url_format])
     speakers = serializers.PrimaryKeyRelatedField(many=True, queryset=Speaker.objects.all())
     activity_type = serializers.ChoiceField(choices=TalkActivityType.choices, default=TalkActivityType.PRESENTATION)
+    mode = serializers.ChoiceField(choices=TalkModeType.choices, default=TalkModeType.IN_PERSON)
     sponsor = SponsorSerializer(read_only=True)
     sponsor_id = serializers.PrimaryKeyRelatedField(queryset=Sponsor.objects.all(), write_only=True, source='sponsor', required=False, allow_null=True)
 

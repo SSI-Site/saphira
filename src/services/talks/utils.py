@@ -9,6 +9,7 @@ def apply_talk_filters(self, queryset):
     - `start_date`: Filtra talks a partir de uma data. Ex: /talks/?start_date=2025-07-27T00:00
     - `end_date`: Filtra talks até uma data. Ex: /talks/?end_date=2025-07-30T23:59
     - `title`: Filtra por título da talk. Ex: /talks/?title=Python
+    - `mode`: Filtra por modalidade da talk (Online ou presencial). Ex: /talks/?mode=ON
     """
     def _parse_datetime(datetime_string):
         try:
@@ -37,5 +38,9 @@ def apply_talk_filters(self, queryset):
     title = self.request.query_params.get('title')
     if title:
         queryset = queryset.filter(title__icontains=title)
+
+    mode = self.request.query_params.get('mode')
+    if mode:
+        queryset = queryset.filter(mode=mode)
 
     return queryset
