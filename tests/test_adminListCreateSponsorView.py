@@ -4,7 +4,7 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from django.urls import reverse
 
-from services.talks.models import Sponsor, SponsorType
+from services.talks.models import Sponsor
 
 class AdminListCreateSponsorViewTestCase(TestCase):
     def setUp(self):
@@ -26,10 +26,11 @@ class AdminListCreateSponsorViewTestCase(TestCase):
         response = self.client.post(self.url, data, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data["message"], "Sponsor criado com sucesso.")
+        self.assertEqual(response.data.get("message"), "Sponsor criado com sucesso.")
         self.assertIn("sponsor", response.data)
-        self.assertEqual(response.data["sponsor"]["name"], data["name"])
-        self.assertEqual(response.data["sponsor"]["sponsor_type"], SponsorType.SPONSOR)
+        sponsor_data = response.data["sponsor"]
+        self.assertEqual(sponsor_data["name"], data["name"])
+        self.assertEqual(sponsor_data["url"], data["url"])
 
     def test_create_sponsor_invalid_data(self):
         data = {
@@ -51,10 +52,10 @@ class AdminListCreateSponsorViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]["sponsor_type"], SponsorType.SPONSOR)
-        self.assertEqual(response.data[1]["sponsor_type"], SponsorType.SPONSOR)
         self.assertEqual(response.data[0]["name"], "Sponsor A")
+        self.assertEqual(response.data[0]["url"], "https://a.com")
         self.assertEqual(response.data[1]["name"], "Sponsor B")
+        self.assertEqual(response.data[1]["url"], "https://b.com")
 
     def test_unauthenticated_user_cannot_access(self):
         self.client.logout()
@@ -72,13 +73,3 @@ class AdminListCreateSponsorViewTestCase(TestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-
-    def test_create_sponsor_invalid_type(self):
-        data = {
-            "name": "Foo",
-            "url": "https://foo.com",
-            "sponsor_type": "XX"
-        }
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn("sponsor_type", response.data)

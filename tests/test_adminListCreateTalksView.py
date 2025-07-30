@@ -7,7 +7,7 @@ from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-from services.talks.models import Talk, TalkActivityType, Sponsor, SponsorType
+from services.talks.models import Talk, TalkActivityType, Sponsor
 from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
@@ -145,8 +145,7 @@ class AdminListCreateTalksViewTestCase(TestCase):
     def test_create_talk_with_sponsor(self):
         sponsor = Sponsor.objects.create(
             name="OpenAI",
-            url="https://openai.com",
-            sponsor_type=SponsorType.PARTNER
+            url="https://openai.com"
         )
 
         data = {
@@ -163,12 +162,12 @@ class AdminListCreateTalksViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
         self.assertIn("talk", response.data)
+
         sponsor_data = response.data["talk"]["sponsor"]
         self.assertEqual(sponsor_data["id"], sponsor.id)
         self.assertEqual(sponsor_data["name"], sponsor.name)
         self.assertEqual(sponsor_data["url"], sponsor.url)
-        self.assertEqual(sponsor_data["sponsor_type"], SponsorType.PARTNER)
-    
+
     def test_create_talk_without_sponsor(self):
         data = {
             "title": "Palestra sem Sponsor",

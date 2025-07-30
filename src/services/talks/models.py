@@ -4,14 +4,9 @@ from services.speakers.models import Speaker
 
 # Create your models here.
 
-class SponsorType(models.TextChoices):
-    SPONSOR = 'SP', 'Sponsor'
-    PARTNER = 'PR', 'Partner'
-
 class Sponsor(models.Model):
     name = models.CharField(max_length=64)
     url = models.URLField()
-    sponsor_type = models.CharField(max_length=2, choices=SponsorType.choices, default=SponsorType.SPONSOR)
 
     def __str__(self):
         return f"Sponsor: '{self.name}'"
