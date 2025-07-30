@@ -15,6 +15,10 @@ class TalkActivityType(models.TextChoices):
     WORKSHOP = 'WS', 'Workshop'
     PRESENTATION = 'PR', 'Presentation'
 
+class TalkModeType(models.TextChoices):
+    ONLINE = 'ON', 'Online'
+    IN_PERSON = 'IP', 'In Person'
+
 class Talk(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=128, unique=True)
@@ -23,6 +27,7 @@ class Talk(models.Model):
     start_time = models.DateTimeField(unique=True)
     end_time = models.DateTimeField(unique=True)
     activity_type = models.CharField(max_length=2, choices=TalkActivityType.choices, default=TalkActivityType.PRESENTATION)
+    mode = models.CharField(max_length=2, choices=TalkModeType.choices, default=TalkModeType.IN_PERSON)
     sponsor = models.ForeignKey(Sponsor, on_delete=models.SET_NULL, null=True, blank=True, related_name='talks')
 
     def __str__(self) -> str:
