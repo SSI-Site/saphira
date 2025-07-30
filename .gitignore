@@ -73,3 +73,5 @@ firebase-key.json
 cloudflare.key
 cloudflare.pem
 
+saphira.key
+saphira.pub
