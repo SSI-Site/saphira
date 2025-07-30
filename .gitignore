@@ -66,4 +66,12 @@ drf_example
 # *api/migrations/*
 .env
 .env.prod
+.env.dev
+.env.test
+
 firebase-key.json
+cloudflare.key
+cloudflare.pem
+
+saphira.key
+saphira.pub

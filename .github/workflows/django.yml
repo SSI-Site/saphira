@@ -8,30 +8,33 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.9, 3.11, 3.12]
     steps:
-    - uses: actions/checkout@v4
-    - name: Install uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        uv sync --no-dev
-    - name: Add secrets.json
-      run: |
-        echo '${{ secrets.FIREBASE_SECRETS }}' > firebase-key.json
-    - name: Run Tests
-      env:
-        SAPHIRA_ENV: ${{ vars.SAPHIRA_ENV }}
-        SAPHIRA_JWT_SECRET_KEY: ${{ secrets.SAPHIRA_JWT_SECRET_KEY }}
-        SAPHIRA_ALLOWED_HOSTS: ${{ vars.SAPHIRA_ALLOWED_HOSTS }}
-      run: |
-       uv run src/manage.py test tests
+      - uses: actions/checkout@v4
+      - name: Create .env.test with enviroment variables
+        run: |
+          echo "SAPHIRA_ENV=${{vars.SAPHIRA_ENV}}" >> .env.test
+          echo "SAPHIRA_JWT_SECRET_KEY=${{ secrets.SAPHIRA_JWT_SECRET_KEY }}" >> .env.test
+          echo "SAPHIRA_ALLOWED_HOSTS=${{ vars.SAPHIRA_ALLOWED_HOSTS }}" >> .env.test
+
+          echo "POSTGRES_DB=${{ vars.POSTGRES_DB }}" >> .env.test
+          echo "POSTGRES_USER=${{ vars.POSTGRES_USER }}" >> .env.test
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env.test
+          echo "POSTGRES_HOST=database-test" >> .env.test
+          echo "POSTGRES_PORT=5432" >> .env.test
+
+          echo "FIREBASE_TYPE=${{ secrets.FIREBASE_TYPE }}" >> .env.test
+          echo "FIREBASE_PROJECT_ID=${{ secrets.FIREBASE_PROJECT_ID }}" >> .env.test
+          echo "FIREBASE_PRIVATE_KEY_ID=${{ secrets.FIREBASE_PRIVATE_KEY_ID }}" >> .env.test
+          echo 'FIREBASE_PRIVATE_KEY="${{ secrets.FIREBASE_PRIVATE_KEY }}"' >> .env.test
+          echo "FIREBASE_CLIENT_EMAIL=${{ secrets.FIREBASE_CLIENT_EMAIL }}" >> .env.test
+          echo "FIREBASE_CLIENT_ID=${{ secrets.FIREBASE_CLIENT_ID }}" >> .env.test
+          echo "FIREBASE_AUTH_URI=${{ secrets.FIREBASE_AUTH_URI }}" >> .env.test
+          echo "FIREBASE_TOKEN_URI=${{ secrets.FIREBASE_TOKEN_URI }}" >> .env.test
+          echo "FIREBASE_AUTH_PROVIDER_X509_CERT_URL=${{ secrets.FIREBASE_AUTH_PROVIDER_X509_CERT_URL }}" >> .env.test
+          echo "FIREBASE_CLIENT_X509_CERT_URL=${{ secrets.FIREBASE_CLIENT_X509_CERT_URL }}" >> .env.test
+          echo "FIREBASE_UNIVERSE_DOMAIN=${{ secrets.FIREBASE_UNIVERSE_DOMAIN }}" >> .env.test
+
+      - name: Run docker compose in test profile
+        run: |
+          docker compose --profile test up --build --exit-code-from tests
+          docker compose --profile test down --volumes

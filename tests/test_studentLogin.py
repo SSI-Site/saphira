@@ -22,7 +22,7 @@ class StudentLoginViewTest(APITestCase):
         student = Student.objects.create(
             name='Aluno Existente',
             email='aluno@example.com',
-            code='ABC123',
+            code='ABC1',
             usp_number='12345678'
         )
 

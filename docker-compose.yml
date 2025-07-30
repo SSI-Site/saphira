@@ -1,0 +1,142 @@
+services:
+  database:
+    image: postgres:alpine
+    container_name: saphira-db
+    ports:
+      - 5432:5432
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    profiles:
+      - production
+      - dev
+    restart: unless-stopped
+
+  migrations:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    container_name: saphira-migrations
+    user: root
+    command: >
+      sh -c "python manage.py makemigrations --no-input &&
+          python manage.py migrate --no-input &&
+          python manage.py collectstatic --no-input &&
+          python manage.py createsuperuser --noinput --username $DJANGO_SUPERUSER_USER --email $DJANGO_SUPERUSER_EMAIL | true
+      "
+    volumes:
+      - static:/app/static
+    environment:
+      PATH: /app/.venv/bin:$PATH
+    env_file:
+      - .env
+    develop:
+      watch:
+        - path: "src"
+          action: sync+restart
+          target: /app
+        - action: rebuild
+          path: uv.lock
+    profiles:
+      - production
+      - dev
+    depends_on:
+      - database
+
+  saphira-api-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: saphira-api-prod
+    ports:
+      - 8000:8000
+    depends_on:
+      - migrations
+    env_file:
+      - .env
+    profiles:
+      - production
+    restart: unless-stopped
+
+  saphira-api-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: saphira-api-dev
+    entrypoint: ["python3", "manage.py", "runserver", "0.0.0.0:8000"]
+    ports:
+      - 8000:8000
+    depends_on:
+      - migrations
+    env_file:
+      - .env
+    profiles:
+      - dev
+    develop:
+      watch:
+        - path: src
+          action: sync
+          target: /app
+          ignore: __pycache__/**
+    restart: unless-stopped
+
+  saphira-web:
+    image: nginx:stable-alpine
+    container_name: saphira-web
+    ports:
+      - 80:80
+      - 443:443
+    profiles:
+      - production
+    depends_on:
+      - saphira-api-prod
+    volumes:
+      - static:/app/static:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./cloudflare.pem:/etc/ssl/certs/cloudflare.pem:ro
+      - ./cloudflare.key:/etc/ssl/private/cloudflare.key:ro
+    restart: unless-stopped
+
+  database-test:
+    image: postgres:alpine
+    container_name: saphira-db-test
+    ports:
+      - 5432:5432
+    env_file:
+      - .env.test
+    profiles:
+      - test
+    restart: on-failure
+
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    container_name: saphira-tests
+    env_file:
+      - .env.test
+    depends_on:
+      database-test:
+        condition: service_started
+    profiles:
+      - test
+    develop:
+      watch:
+        - action: sync+restart
+          path: tests
+          target: /app/tests
+    command: >
+      sh -c "python manage.py makemigrations --no-input &&
+          python manage.py migrate --no-input &&
+          python manage.py collectstatic --no-input &&
+          python manage.py test
+      "
+
+volumes:
+  pg_data:
+  static:
