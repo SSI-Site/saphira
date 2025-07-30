@@ -7,7 +7,10 @@ from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 from datetime import datetime as dt, timedelta
 
-from api.models import Presence, Student, Talk, Speaker
+from services.talks.models import Talk
+from services.presences.models import Presence
+from services.speakers.models import Speaker
+from services.students.models import Student
 
 class AdminRetrieveStudentInfoViewTestCase(APITestCase):
 
@@ -32,11 +35,11 @@ class AdminRetrieveStudentInfoViewTestCase(APITestCase):
 
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(speaker)
 
         student1 = Student.objects.create(
             name = "Glauber",

@@ -1,6 +1,7 @@
-from api.models import Gift, Student, StudentGift
+from services.students.models import Student, StudentGift
+from services.gifts.models import Gift
 from django.test import TestCase
-from api.utils import update_gift_balance
+from services.gifts.utils import update_gift_balance
 
 class GiftModelTestCase(TestCase):
     def test_create_gift(self):

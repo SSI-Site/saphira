@@ -1,12 +1,14 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
+from rest_framework import status
 from django.urls import reverse
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
 from uuid import uuid4
 
-from api.models import Talk, Speaker
+from services.talks.models import Talk, TalkActivityType, Sponsor
+from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
@@ -33,29 +35,29 @@ class AdminListCreateTalksViewTestCase(TestCase):
 
     def test_create_talk(self):
         data = {
-            "title": "Palestra Teste",
-            "speaker": self.speaker.id,
+            "title": "Palestra Existente",
+            "speakers": [self.speaker.id],
             "description": "Descrição",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
         }
 
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
         self.assertIn("talk", response.data)
 
     def test_list_talks(self):
-        Talk.objects.create(
+        talk = Talk.objects.create(
             title="Palestra Existente",
-            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["title"], "Palestra Existente")
 
@@ -63,52 +65,121 @@ class AdminListCreateTalksViewTestCase(TestCase):
         user = User.objects.create_user(username="user", password="password123")
         self.client.login(username="user", password="password123")
         response = self.client.post(self.url, {})
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_unauthenticated_user_cant_access(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_create_talk_invalid_datetime_format(self):
         data = {
             "title": "Palestra Inválida",
             "start_time": "2024-13-32T25:70", 
             "end_time": "2024-13-32T26:70", 
-            "speaker": self.speaker.id
+            "speakers": [self.speaker.id]
         }
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_duplicate_talk_title_and_start_time(self):
-        Talk.objects.create(
+        talk = Talk.objects.create(
             title="Palestra Existente",
-            speaker=self.speaker,
             description="Descrição",
             start_time=self.now,
             end_time=self.now + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         data = {
             "title": "Palestra Existente",
-            "speaker": self.speaker.id,
+            "speakers": [self.speaker.id],
             "description": "Descrição",
             "start_time": self.now.isoformat(), 
             "end_time": (self.now + timedelta(hours=1)).isoformat()
         }
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_inexistent_speaker_exception(self):
         inexistent_id = uuid4()
         data = {
             "title": "Palestra Teste",
-            "speaker": inexistent_id,
+            "speakers": [inexistent_id],
             "description": "Descrição",
             "start_time": self.now.strftime(DATETIME_FORMAT),
             "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
         }
 
         response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data['error'], f"Palestrante com id {inexistent_id} não encontrado(a).")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], f"Palestrantes com ids ['{inexistent_id}'] não encontrados.")
+
+    def test_create_talk_with_activity_type(self):
+        data = {
+            "title": "Oficina Teste",
+            "speakers": [self.speaker.id],
+            "description": "Oficina sobre Django",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+            "activity_type": TalkActivityType.WORKSHOP
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.WORKSHOP)
+
+    def test_create_talk_without_activity_type_uses_default(self):
+        data = {
+            "title": "Palestra sem tipo",
+            "speakers": [self.speaker.id],
+            "description": "Teste",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["talk"]["activity_type"], TalkActivityType.PRESENTATION)
+
+    def test_create_talk_with_sponsor(self):
+        sponsor = Sponsor.objects.create(
+            name="OpenAI",
+            url="https://openai.com"
+        )
+
+        data = {
+            "title": "Palestra com Sponsor",
+            "speakers": [self.speaker.id],
+            "description": "Talk patrocinada",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT),
+            "sponsor_id": sponsor.id
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
+        self.assertIn("talk", response.data)
+
+        sponsor_data = response.data["talk"]["sponsor"]
+        self.assertEqual(sponsor_data["id"], sponsor.id)
+        self.assertEqual(sponsor_data["name"], sponsor.name)
+        self.assertEqual(sponsor_data["url"], sponsor.url)
+
+    def test_create_talk_without_sponsor(self):
+        data = {
+            "title": "Palestra sem Sponsor",
+            "speakers": [self.speaker.id],
+            "description": "Sem patrocinador",
+            "start_time": self.now.strftime(DATETIME_FORMAT),
+            "end_time": (self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
+        }
+
+        response = self.client.post(self.url, data, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["message"], "Palestra criada com sucesso.")
+        self.assertIn("talk", response.data)
+        self.assertIsNone(response.data["talk"]["sponsor"])

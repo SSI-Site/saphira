@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 from os import getenv
 from sys import exit
+import sys
+import os
 
 from dotenv import load_dotenv
 
@@ -24,6 +26,10 @@ from .firebase_config import *  # Importa a inicialização do Firebase
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Adiciona services para o PYTHON_PATH, tornando seus módulos visiveis ao modulo saphira
+# Permite importar modulos sem escrever services.*
+sys.path.append(os.path.join(BASE_DIR, 'services'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -58,8 +64,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
     'rest_framework',
-    'api',
+    'drf_spectacular',
     'corsheaders',
+    'services.api.apps.ApiConfig',
+    'services.students.apps.StudentsConfig',
+    'services.gifts.apps.GiftsConfig',
+    'services.speakers.apps.SpeakersConfig',
+    'services.winners.apps.WinnersConfig',
+    'services.talks.apps.TalksConfig',
+    'services.presences.apps.PresencesConfig',
 ]
 
 REST_FRAMEWORK = {
@@ -74,6 +87,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny', # Por padrão, todas as rotas são públicas
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema' # Usa o Swagger UI pra mostrar todos os endpoints do sistema
 }
 
 SIMPLE_JWT = {
@@ -202,6 +216,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# DRF Spectecular
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Saphira API',
+    'DESCRIPTION': 'Serviço REST API para o gerenciamento de informações na Semana de Sistemas de Informação',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
 
 
 # Internationalization

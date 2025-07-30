@@ -6,7 +6,10 @@ from django.urls import reverse
 from django.test import TestCase
 from datetime import datetime as dt, timedelta
 from zoneinfo import ZoneInfo
-from api.models import Student, Talk, Speaker, DrawWinner
+from services.talks.models import Talk
+from services.winners.models import DrawWinner
+from services.students.models import Student
+from services.speakers.models import Speaker
 
 DATETIME_FORMAT = "%Y-%m-%dT%H:%M"
 
@@ -45,18 +48,18 @@ class AdminListRetrieveWinnerViewTestCase(TestCase):
         self.now = dt.now(ZoneInfo('America/Sao_Paulo'))
         self.talk1 = Talk.objects.create(
             title='Talk 01',
-            speaker=self.speaker1,
             description='Descricao 01',
             start_time=self.now.strftime(DATETIME_FORMAT),
             end_time=(self.now + timedelta(hours=1)).strftime(DATETIME_FORMAT)
         )
+        self.talk1.speakers.add(self.speaker1)
         self.talk2 = Talk.objects.create(
             title='Talk 02',
-            speaker=self.speaker2,
             description='Descricao 02',
             start_time=(self.now + timedelta(days=1)).strftime(DATETIME_FORMAT),
             end_time=(self.now + timedelta(days=1) + timedelta(hours=1)).strftime(DATETIME_FORMAT)
         )
+        self.talk2.speakers.add(self.speaker2)
 
         self.draw_winner1 = DrawWinner.objects.create(
             talk=self.talk1,

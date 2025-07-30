@@ -1,7 +1,8 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from api.models import Speaker, Student
+from services.speakers.models import Speaker
+from services.students.models import Student
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 import uuid

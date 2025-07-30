@@ -7,7 +7,10 @@ from rest_framework.response import Response
 from rest_framework.test import APIClient, APITestCase
 from datetime import datetime as dt, timedelta
 
-from api.models import Presence, Student, Talk, Speaker
+from services.talks.models import Talk, TalkActivityType
+from services.presences.models import Presence
+from services.speakers.models import Speaker
+from services.students.models import Student
 
 class AdminDrawOnTalkTestCase(APITestCase):
 
@@ -42,11 +45,11 @@ class AdminDrawOnTalkTestCase(APITestCase):
         """Testa o endpoint com uma palestra valida mas sem presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         self.client.force_login(user=self.admin)
         response: Response = self.client.get(self.url(talk.id), format="json")
@@ -58,11 +61,11 @@ class AdminDrawOnTalkTestCase(APITestCase):
         """Testa o endpoint com uma palestra valida mas com presenças"""
         talk = Talk.objects.create(
             title="Palestra do Neymar",
-            speaker=self.speaker,
             description="A palestra do neymar",
             start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
             end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
         )
+        talk.speakers.add(self.speaker)
 
         student = Student.objects.create(
             name = "Glauber",
@@ -85,6 +88,19 @@ class AdminDrawOnTalkTestCase(APITestCase):
             'code': student.code,
             'usp_number': student.usp_number,
         })
+
+    def test_talk_with_activity_type_workshop(self):
+        """Testa se uma palestra com tipo 'WORKSHOP' é criada corretamente"""
+        talk = Talk.objects.create(
+            title="Oficina com Neymar",
+            description="Workshop sobre dribles",
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1),
+            activity_type=TalkActivityType.WORKSHOP
+        )
+        talk.speakers.add(self.speaker)
+
+        self.assertEqual(talk.activity_type, TalkActivityType.WORKSHOP)
 
     # Retorna a url com o talk_id
     def url(self, id: int) -> str:
