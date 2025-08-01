@@ -2,9 +2,6 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from services.speakers.models import Speaker
-from services.students.models import Student
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
 import uuid
 
 class RetrieveSpeakerByNameViewTestCase(APITestCase):
@@ -14,21 +11,24 @@ class RetrieveSpeakerByNameViewTestCase(APITestCase):
             id=uuid.uuid4(),
             name="Maria Silva",
             description="Especialista em IA",
-            social_media="@maria",
+            linkedin_link="in/mariasilva",
+            instagram_link="@mariasilva",
             pronouns="ela/dela"
         )
         self.speaker2 = Speaker.objects.create(
             id=uuid.uuid4(),
             name="João Souza",
             description="Desenvolvedor Python",
-            social_media="@joao",
+            linkedin_link="in/joao_souza",
+            instagram_link="@joaosouza",
             pronouns="ele/dele"
         )
         self.speaker3 = Speaker.objects.create(
             id=uuid.uuid4(),
             name="Maria Clara",
             description="Cientista de Dados",
-            social_media="@clarinha",
+            linkedin_link="in/mariaclara",
+            instagram_link="@mariaclara",
             pronouns="ela/dela"
         )
 

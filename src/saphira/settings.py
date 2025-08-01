@@ -122,12 +122,14 @@ CSRF_USE_SESSIONS = False
 CSRF_COOKIE_SAMESITE = 'None' #'Lax' ou 'Strict'
 if ENV == 'PRODUCTION':
     CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
     ]
 else:
     CSRF_TRUSTED_ORIGINS = [
+        "http://localhost:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "https://semanadesi.com",
@@ -138,12 +140,14 @@ else:
 # Como os domínios são diferentes, é necessário permitir o envio de cookies
 if ENV == 'PRODUCTION':
     CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "https://semanadesi.com",

@@ -3,7 +3,6 @@ from rest_framework.test import APITestCase
 from rest_framework import status
 from services.speakers.models import Speaker
 from django.contrib.auth.models import User
-from rest_framework_simplejwt.tokens import RefreshToken
 import uuid
 
 class AdminUpdateDestroySpeakerViewTestCase(APITestCase):
@@ -23,7 +22,8 @@ class AdminUpdateDestroySpeakerViewTestCase(APITestCase):
         data = {
             "name": "Novo Nome",
             "description": "Nova descrição",
-            "social_media": "@novonome",
+            "linkedin_link": "in/novonome",
+            "instagram_link": "@novonome",
             "pronouns": "ele/dele"
         }
         response = self.client.put(self.url, data, format="json")
@@ -31,7 +31,8 @@ class AdminUpdateDestroySpeakerViewTestCase(APITestCase):
         self.speaker.refresh_from_db()
         self.assertEqual(self.speaker.name, data["name"])
         self.assertEqual(self.speaker.description, data["description"])
-        self.assertEqual(self.speaker.social_media, data["social_media"])
+        self.assertEqual(self.speaker.linkedin_link, data["linkedin_link"])
+        self.assertEqual(self.speaker.instagram_link, data["instagram_link"])
         self.assertEqual(self.speaker.pronouns, data["pronouns"])
 
     def test_update_speaker_not_found(self):
@@ -41,7 +42,8 @@ class AdminUpdateDestroySpeakerViewTestCase(APITestCase):
         data = {
             "name": "Nome Inexistente",
             "description": "Descrição",
-            "social_media": "@inexistente",
+            "linkedin_link": "in/inexistente",
+            "instagram_link": "@inexistente",
             "pronouns": "ele/dele"
         }
         response = self.client.put(url, data, format="json")

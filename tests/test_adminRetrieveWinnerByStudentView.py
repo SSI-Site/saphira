@@ -37,7 +37,8 @@ class AdminRetrieveWinnerByStudentViewTestCase(APITestCase):
         speaker = Speaker.objects.create(
             name="Maria Silva",
             description="Especialista em IA",
-            social_media="@maria",
+            linkedin_link="in/maria",
+            instagram_link="@maria",
             pronouns="ela/dela",
             role="Junior frontend developer"
         )
