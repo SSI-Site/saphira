@@ -28,7 +28,8 @@ class AdminRetrieveStudentInfoViewTestCase(APITestCase):
         speaker = Speaker.objects.create(
             name="Neymar",
             description="Menino Ney",
-            social_media="@neymar.jr",
+            linkedin_link="in/neymar.jr",
+            instagram_link="@neymar.jr",
             pronouns="ele/dele",
             role="Jogador de bola"
         )

@@ -25,7 +25,8 @@ class AdminListCreateTalksViewTestCase(TestCase):
         self.speaker = Speaker.objects.create(
             name="Palestrante Teste",
             description="Descrição do palestrante",
-            social_media="@palestranteteste",
+            linkedin_link="in/palestranteteste",
+            instagram_link="@palestranteteste",
             pronouns="ele/dele",
             role="Palestrante"
         )

@@ -29,7 +29,8 @@ class RetrieveSpeakerByNameView(generics.ListAPIView):
                 'id': speaker.id,
                 'name': speaker.name,
                 'description': speaker.description,
-                'social_media': speaker.social_media,
+                'linkedin_link': speaker.linkedin_link,
+                'instagram_link': speaker.instagram_link,
                 'pronouns': speaker.pronouns
             }
             for speaker in queryset
@@ -45,7 +46,7 @@ class RetrieveSpeakersView(generics.RetrieveAPIView):
     queryset = Speaker.objects.all()
 
     def get(self, request, *args, **kwargs):
-        speakers = self.get_queryset().values('id', 'name', 'description', 'social_media', 'pronouns', 'role')
+        speakers = self.get_queryset().values('id', 'name', 'description', 'linkedin_link', 'instagram_link', 'pronouns', 'role')
         return Response(list(speakers))
 
 ############################################################################################################
@@ -63,7 +64,8 @@ class AdminCreateSpeakerView(generics.CreateAPIView):
     Campos necessários:
     - `name`: nome do palestrante
     - `description`: descrição pessoal do palestrante
-    - `social_media`: link para rede social, no formato https://rede-social.com
+    - `linkedin_link`: link para o linkedin, no formato https://rede-social.com
+    - `instagram_link`: link para o instagram, no formato https://rede-social.com
     - `pronouns`: pronomes do palestrante no formato pro/nome
     - `role`: cargo do palestrante, ex: (técnico de futebol, etc.)
     """
@@ -100,7 +102,7 @@ class AdminUpdateDestroySpeakerView(generics.RetrieveUpdateDestroyAPIView):
     def put(self, request, *args, **kwargs):
         """Atualiza palestrante.
 
-        É possível atualizar os campos: `name`, `description`, 'social_media', 'pronouns'
+        É possível atualizar os campos: `name`, `description`, 'linkedin_link', 'instagram_link', 'pronouns'
         e 'role'
     ]
         """
@@ -108,7 +110,8 @@ class AdminUpdateDestroySpeakerView(generics.RetrieveUpdateDestroyAPIView):
         allowed_fields = [
             'name',
             'description',
-            'social_media',
+            'linkedin_link',
+            'instagram_link',
             'pronouns',
             'role'
         ]
@@ -123,7 +126,8 @@ class AdminUpdateDestroySpeakerView(generics.RetrieveUpdateDestroyAPIView):
             'id': speaker.id,
             'name': speaker.name,
             'description': speaker.description,
-            'social_media': speaker.social_media,
+            'instagram_link': speaker.instagram_link,
+            'linkedin_link': speaker.linkedin_link,
             'pronouns': speaker.pronouns,
         })
 

@@ -25,7 +25,8 @@ class AdminDrawOnTalkTestCase(APITestCase):
         self.speaker = Speaker.objects.create(
             name="Neymar",
             description="Grande menino Ney em sua skin palestrante",
-            social_media="@neymar.jr",
+            linkedin_link="in/ney",
+            instagram_link="@neymar",
             pronouns="ele/dele",
             role="Jogador de fut"
         )

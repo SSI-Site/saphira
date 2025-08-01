@@ -67,7 +67,8 @@ class AdminRetrieveUpdateDestroySponsorViewTestCase(TestCase):
         speaker = Speaker.objects.create(
             name="Speaker",
             description="desc",
-            social_media="@social",
+            linkedin_link="in/social",
+            instagram_link="@social",
             pronouns="ele/dele",
             role="palestrante"
         )

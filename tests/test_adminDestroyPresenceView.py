@@ -31,7 +31,8 @@ class AdminDestroyPresenceViewTestCase(TestCase):
         self.speaker = Speaker.objects.create(
             name="Palestrante Teste",
             description="Descrição do palestrante",
-            social_media="@palestranteteste",
+            linkedin_link="in/palestranteteste",
+            instagram_link="@palestranteteste",
             pronouns="ele/dele",
             role="Palestrante"
         )
@@ -102,5 +103,4 @@ class AdminDestroyPresenceViewTestCase(TestCase):
         self.client.logout()
 
         response = self.client.delete(self.url)
-        self.assertEqual(response.status_code, 403) 
-
+        self.assertEqual(response.status_code, 403)

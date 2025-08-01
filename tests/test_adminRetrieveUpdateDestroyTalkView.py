@@ -25,7 +25,8 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
         self.speaker = Speaker.objects.create(
             name="Palestrante Teste",
             description="Descrição do palestrante",
-            social_media="@palestranteteste",
+            linkedin_link="in/palestranteteste",
+            instagram_link="@palestranteteste",
             pronouns="ele/dele",
             role="Palestrante"
         )
@@ -86,7 +87,8 @@ class AdminRetrieveUpdateDestroyTalkViewTestCase(TestCase):
         speaker = Speaker.objects.create(
             name="Palestrante Teste 2",
             description="Descrição do palestrante 2",
-            social_media="@palestranteteste2",
+            linkedin_link="in/palestranteteste2",
+            instagram_link="@palestranteteste2",
             pronouns="ele/dele",
             role="Palestrante"
         )

@@ -33,14 +33,16 @@ class AdminListRetrieveWinnerViewTestCase(TestCase):
         self.speaker1 = Speaker.objects.create(
             name='Palestrante 01',
             description='Palestrante teste 01',
-            social_media='@pal_teste01',
+            linkedin_link='in/pal_teste01',
+            instagram_link='@pal_teste01',
             pronouns='ele/dele',
             role='Amazon intern'
         )
         self.speaker2 = Speaker.objects.create(
             name='Palestrante 02',
             description='Palestrante teste 02',
-            social_media='@pal_teste02',
+            linkedin_link='in/pal_teste02',
+            instagram_link='@pal_teste02',
             pronouns='ela/dela',
             role='Google intern'
         )

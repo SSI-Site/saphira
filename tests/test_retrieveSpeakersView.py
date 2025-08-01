@@ -2,9 +2,6 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
 from services.speakers.models import Speaker
-from services.students.models import Student
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
 import uuid
 
 class RetrieveSpeakerViewTestCase(APITestCase):
@@ -14,7 +11,8 @@ class RetrieveSpeakerViewTestCase(APITestCase):
             id=uuid.uuid4(),
             name="Maria Silva",
             description="Especialista em IA",
-            social_media="@maria",
+            linkedin_link="in/mariasilva",
+            instagram_link="@mariasilva",
             pronouns="ela/dela",
             role="Junior frontend developer"
         )
@@ -23,7 +21,8 @@ class RetrieveSpeakerViewTestCase(APITestCase):
             id=uuid.uuid4(),
             name="João Souza",
             description="Desenvolvedor Python",
-            social_media="@joao",
+            linkedin_link="in/joao_souza",
+            instagram_link="@joaosouza",
             pronouns="ele/dele",
             role="Senior backend developer"
         )
@@ -32,7 +31,8 @@ class RetrieveSpeakerViewTestCase(APITestCase):
             id=uuid.uuid4(),
             name="Ana Clara",
             description="Cientista de Dados",
-            social_media="@clarinha",
+            linkedin_link="in/anaclara",
+            instagram_link="@anaclara",
             pronouns="ela/dela",
             role="Devops intern"
         )
@@ -49,7 +49,8 @@ class RetrieveSpeakerViewTestCase(APITestCase):
             "id": self.speaker1.id,
             "name": self.speaker1.name,
             "description": self.speaker1.description,
-            "social_media": self.speaker1.social_media,
+            "linkedin_link": self.speaker1.linkedin_link,
+            "instagram_link": self.speaker1.instagram_link,
             "pronouns": self.speaker1.pronouns,
             "role": self.speaker1.role
         }
@@ -58,7 +59,8 @@ class RetrieveSpeakerViewTestCase(APITestCase):
             "id": self.speaker2.id,
             "name": self.speaker2.name,
             "description": self.speaker2.description,
-            "social_media": self.speaker2.social_media,
+            "linkedin_link": self.speaker2.linkedin_link,
+            "instagram_link": self.speaker2.instagram_link,
             "pronouns": self.speaker2.pronouns,
             "role": self.speaker2.role
         }
@@ -67,7 +69,8 @@ class RetrieveSpeakerViewTestCase(APITestCase):
             "id": self.speaker3.id,
             "name": self.speaker3.name,
             "description": self.speaker3.description,
-            "social_media": self.speaker3.social_media,
+            "linkedin_link": self.speaker3.linkedin_link,
+            "instagram_link": self.speaker3.instagram_link,
             "pronouns": self.speaker3.pronouns,
             "role": self.speaker3.role
         }
