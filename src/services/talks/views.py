@@ -60,7 +60,7 @@ class AdminListCreateSponsorView(generics.ListCreateAPIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@extend_schema(tags=['Talks'], summary="Retrieve sponsor")
+@extend_schema(tags=['Sponsors'], summary="Retrieve sponsor")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminRetrieveUpdateDestroySponsorView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Sponsor.objects.all()
@@ -103,7 +103,7 @@ class AdminRetrieveUpdateDestroySponsorView(generics.RetrieveUpdateDestroyAPIVie
             status=status.HTTP_200_OK
         )
 
-@extend_schema(tags=['Talks'], summary="List sponsor")
+@extend_schema(tags=['Talks'], summary="List talks")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateTalksView(generics.ListCreateAPIView):
     queryset = Talk.objects.all()

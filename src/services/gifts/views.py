@@ -50,7 +50,6 @@ class ListRetrieveGiftsView(generics.ListAPIView):
 @extend_schema(
     tags=['Gifts'],
     summary='Listagem de brindes',
-    responses={201: GiftPublicSerializer}
 )
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateGiftsView(generics.ListCreateAPIView):

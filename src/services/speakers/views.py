@@ -14,40 +14,26 @@ from ..api.decorators import admin_auth_required
 
 @extend_schema(
     tags=["Speakers"],
-    summary="Retrieve speakers"
+    summary="Retrieve speakers",
+    responses={200: SpeakerSerializer(many=True)}
 )
 class RetrieveSpeakerByNameView(generics.ListAPIView):
     """Retorna um palestrante a partir do seu nome."""
+    serializer_class = SpeakerSerializer
+    
     def get_queryset(self):
         name = self.kwargs.get('name')
         return Speaker.objects.filter(name__icontains=name)
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        speakers = [
-            {
-                'id': speaker.id,
-                'name': speaker.name,
-                'description': speaker.description,
-                'linkedin_link': speaker.linkedin_link,
-                'instagram_link': speaker.instagram_link,
-                'pronouns': speaker.pronouns
-            }
-            for speaker in queryset
-        ]
-        return Response(speakers)
-
 @extend_schema(
     tags=["Speakers"],
-    summary="List speakers"
+    summary="List speakers",
+    responses={200: SpeakerSerializer(many=True)}
 )
-class RetrieveSpeakersView(generics.RetrieveAPIView):
+class RetrieveSpeakersView(generics.ListAPIView):
     """Retorna uma lista de todos os palestrantes"""
     queryset = Speaker.objects.all()
-
-    def get(self, request, *args, **kwargs):
-        speakers = self.get_queryset().values('id', 'name', 'description', 'linkedin_link', 'instagram_link', 'pronouns', 'role')
-        return Response(list(speakers))
+    serializer_class = SpeakerSerializer
 
 ############################################################################################################
 #                                               ADMIN VIEWS
@@ -88,6 +74,7 @@ class AdminCreateSpeakerView(generics.CreateAPIView):
 )
 @method_decorator(admin_auth_required, name='delete')
 class AdminUpdateDestroySpeakerView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SpeakerSerializer
     lookup_field = 'speaker_id'
 
     def get_object(self):
@@ -96,42 +83,37 @@ class AdminUpdateDestroySpeakerView(generics.RetrieveUpdateDestroyAPIView):
 
         if not speaker:
             raise Http404(f"Palestrante com id {lookup_value} não encontrado.")
+        self.check_object_permissions(self.request, speaker)
         return speaker
 
-    @extend_schema(summary="Update speaker")
+    @extend_schema(
+        summary="Update speaker",
+        request=SpeakerSerializer,
+        responses={200: SpeakerSerializer},
+        description="Atualiza palestrante. É possível atualizar os campos: name, description, linkedin_link, instagram_link, pronouns e role"
+    )
     def put(self, request, *args, **kwargs):
         """Atualiza palestrante.
 
         É possível atualizar os campos: `name`, `description`, 'linkedin_link', 'instagram_link', 'pronouns'
         e 'role'
-    ]
         """
         speaker = self.get_object()
-        allowed_fields = [
-            'name',
-            'description',
-            'linkedin_link',
-            'instagram_link',
-            'pronouns',
-            'role'
-        ]
+        serializer = self.get_serializer(speaker, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        for field in allowed_fields:
-            if field in request.data:
-                setattr(speaker, field, request.data[field])
-
-        speaker.save()
-
-        return Response({
-            'id': speaker.id,
-            'name': speaker.name,
-            'description': speaker.description,
-            'instagram_link': speaker.instagram_link,
-            'linkedin_link': speaker.linkedin_link,
-            'pronouns': speaker.pronouns,
-        })
-
-    @extend_schema(summary="Delete speaker")
+    @extend_schema(
+        summary="Delete speaker",
+        responses={
+            200: {"type": "object", "properties": {"message": {"type": "string"}}},
+            404: {"type": "object", "properties": {"detail": {"type": "string"}}}
+        },
+        description="Remove um palestrante com base no id"
+    )
     def delete(self, request, *args, **kwargs):
         """Remove um palestrante com base no id"""
         speaker = self.get_object()

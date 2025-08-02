@@ -34,7 +34,7 @@ def generate_unique_code(length=3):
 ############################################################################################################
 @extend_schema(
     summary="Login student",
-    tags=["Students"]
+    tags=["Students"],
 )
 @method_decorator(firebase_auth_required, name='dispatch')
 class StudentLogin(APIView):

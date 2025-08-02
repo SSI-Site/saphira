@@ -18,7 +18,9 @@ from drf_spectacular.utils import extend_schema
 ############################################################################################################
 @extend_schema(
     tags=['Public'],
-    summary="Ponto de entrada")
+    summary="Ponto de entrada",
+    responses={200: {"type": "object", "properties": {"message": {"type": "string"}}}}
+)
 @api_view(['GET'])
 def index(request):
     """Ponto de entrada para o Saphira. Seja bem-vindo. Se essa endpoint não estiver funcionando o Saphira está fora do ar."""
@@ -27,7 +29,8 @@ def index(request):
 @extend_schema(
     tags=['Admin'],
     summary="Admin login",
-    methods=["POST"]
+    methods=["POST"],
+    responses={200: {"type": "object", "properties": {"detail": {"type": "string"}}}}
 )
 class AdminLoginView(APIView):
     serializer_class = AdminSerializer
@@ -49,7 +52,8 @@ class AdminLoginView(APIView):
 @extend_schema(
     tags=["Admin"],
     summary="Admin Logout",
-    methods=["POST"]
+    methods=["POST"],
+    responses={200: {"type": "object", "properties": {"message": {"type": "string"}}}}
 )
 class AdminLogoutView(APIView):
     serializer_class = EmptySerializer
@@ -75,7 +79,9 @@ class AdminLogoutView(APIView):
 ############################################################################################################
 @extend_schema(
     tags=["Admin"],
-    summary="Admin index")
+    summary="Admin index",
+    responses={200: {"type": "object", "properties": {"message": {"type": "string"}}}}
+)
 @api_view(['GET'])
 @admin_auth_required
 def admin_index(request):
