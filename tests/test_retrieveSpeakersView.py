@@ -8,7 +8,7 @@ class RetrieveSpeakerViewTestCase(APITestCase):
     def setUp(self):
         # Cria alguns palestrantes
         self.speaker1 = Speaker.objects.create(
-            id=uuid.uuid4(),
+            id=str(uuid.uuid4()),
             name="Maria Silva",
             description="Especialista em IA",
             linkedin_link="in/mariasilva",
@@ -18,7 +18,7 @@ class RetrieveSpeakerViewTestCase(APITestCase):
         )
 
         self.speaker2 = Speaker.objects.create(
-            id=uuid.uuid4(),
+            id=str(uuid.uuid4()),
             name="João Souza",
             description="Desenvolvedor Python",
             linkedin_link="in/joao_souza",
@@ -28,7 +28,7 @@ class RetrieveSpeakerViewTestCase(APITestCase):
         )
 
         self.speaker3 = Speaker.objects.create(
-            id=uuid.uuid4(),
+            id=str(uuid.uuid4()),
             name="Ana Clara",
             description="Cientista de Dados",
             linkedin_link="in/anaclara",
