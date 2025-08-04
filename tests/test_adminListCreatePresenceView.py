@@ -1,3 +1,4 @@
+import uuid
 from django.test import TestCase
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
@@ -103,6 +104,119 @@ class AdminListCreatePresenceViewTestCase(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+
+    def test_filter_presences_by_talk_id(self):
+        # Create a second talk and presences for testing filters
+        talk2 = Talk.objects.create(
+            title='Palestra de Teste 2',
+            description='Descrição 2',
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
+        )
+
+        # Create another student
+        student2 = Student.objects.create(
+            name='Outro Aluno',
+            email='outro@example.com',
+            usp_number='87654321',
+            code='B456'
+        )
+
+        # Create presences for both talks and students
+        presence1 = Presence.objects.create(student=self.student, talk=self.talk)
+        presence2 = Presence.objects.create(student=student2, talk=self.talk)
+        presence3 = Presence.objects.create(student=self.student, talk=talk2)
+
+        # Test filtering by first talk_id
+        response = self.client.get(f"{self.url}?talk_id={self.talk.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)  # Should return 2 presences for talk1
+
+        # Test filtering by second talk_id
+        response = self.client.get(f"{self.url}?talk_id={talk2.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)  # Should return 1 presence for talk2
+
+        # Test filtering by non-existent talk_id
+        response = self.client.get(f"{self.url}?talk_id=99999")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)  # Should return 0 presences
+
+    def test_filter_presences_by_talk_id_and_student_id(self):
+        # Create a second talk and presences for testing filters
+        talk2 = Talk.objects.create(
+            title='Palestra de Teste 2',
+            description='Descrição 2',
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
+        )
+
+        # Create another student
+        student2 = Student.objects.create(
+            name='Outro Aluno',
+            email='outro@example.com',
+            usp_number='87654321',
+            code='B456'
+        )
+
+        # Create presences for both talks and students
+        presence1 = Presence.objects.create(student=self.student, talk=self.talk)
+        presence2 = Presence.objects.create(student=student2, talk=self.talk)
+        presence3 = Presence.objects.create(student=self.student, talk=talk2)
+
+        # Test filtering by both talk_id and student_id (should match one presence)
+        response = self.client.get(f"{self.url}?talk_id={self.talk.id}&student_id={self.student.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        # Test filtering by both talk_id and student_id (should match one presence)
+        response = self.client.get(f"{self.url}?talk_id={talk2.id}&student_id={self.student.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        # Test filtering by both talk_id and student_id (should match no presence)
+        response = self.client.get(f"{self.url}?talk_id={talk2.id}&student_id={student2.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_filter_presences_by_student_id(self):
+        # Create a second talk and presences for testing filters
+        talk2 = Talk.objects.create(
+            title='Palestra de Teste 2',
+            description='Descrição 2',
+            start_time=dt.now(ZoneInfo('America/Sao_Paulo')),
+            end_time=dt.now(ZoneInfo('America/Sao_Paulo')) + timedelta(hours=1)
+        )
+
+        # Create another student
+        student2 = Student.objects.create(
+            name='Outro Aluno',
+            email='outro@example.com',
+            usp_number='87654321',
+            code='B456'
+        )
+
+        # Create presences for both talks and students
+        presence1 = Presence.objects.create(student=self.student, talk=self.talk)
+        presence2 = Presence.objects.create(student=student2, talk=self.talk)
+        presence3 = Presence.objects.create(student=self.student, talk=talk2)
+
+        # Test filtering by first student_id
+        response = self.client.get(f"{self.url}?student_id={self.student.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)  # Should return 2 presences for student1
+
+        # Test filtering by second student_id
+        response = self.client.get(f"{self.url}?student_id={student2.id}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)  # Should return 1 presence for student2
+
+        # Test filtering by non-existent student_id
+        fake_uuid = uuid.UUID('00000000-0000-0000-0000-000000000000')
+        response = self.client.get(f"{self.url}?student_id={fake_uuid}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)  # Should return 0 presences
 
 class StudentGiftAssignmentAPITestCase(TestCase):
     def setUp(self):

@@ -12,17 +12,52 @@ from services.presences.serializers import CreatePresenceSerializer
 from services.students.models import Student
 from services.talks.models import Talk
 
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 # Create your views here.
 
 @extend_schema(
     tags=["Presences"],
-    summary="List presences")
+    summary="List presences",
+    parameters=[
+        OpenApiParameter(
+            name='talk_id',
+            description='ID da palestra para filtrar as presenças',
+            required=False,
+            type=str
+        ),
+        OpenApiParameter(
+            name='student_id',
+            description='ID do estudante para filtrar as presenças',
+            required=False,
+            type=str
+        )
+    ])
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreatePresenceView(generics.ListCreateAPIView):
-    """Listagem de presenças"""
+    """Listagem de presenças
+    
+    Você pode filtrar a lista usando os seguintes parâmetros na URL:
+    - `talk_id`: Filtra por ID da palestra. Ex: /admin/presences/?talk_id=abc123
+    - `student_id`: Filtra por ID do estudante. Ex: /admin/presences/?student_id=def456
+    """
     queryset = Presence.objects.all()
     serializer_class = CreatePresenceSerializer
+    
+    def get_queryset(self):
+        """
+        Aplica filtros às presenças por talk_id e student_id
+        """
+        queryset = super().get_queryset()
+        talk_id = self.request.query_params.get('talk_id')
+        student_id = self.request.query_params.get('student_id')
+        
+        if talk_id:
+            queryset = queryset.filter(talk_id=talk_id)
+            
+        if student_id:
+            queryset = queryset.filter(student_id=student_id)
+            
+        return queryset
 
     @extend_schema(
         tags=["Presences"],
