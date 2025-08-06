@@ -121,7 +121,7 @@ class AdminListCreateTalksView(generics.ListCreateAPIView):
         """
         serializer = self.get_serializer(data=request.data)
 
-        speaker_ids = request.data.get('speakers', [])
+        speaker_ids = list(request.data.get('speakers', []))
         if not speaker_ids:
             return Response({'error': "Pelo menos um palestrante deve ser especificado."}, status=status.HTTP_400_BAD_REQUEST)
 
