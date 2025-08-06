@@ -28,7 +28,7 @@ class Talk(models.Model):
     end_time = models.DateTimeField(unique=True)
     activity_type = models.CharField(max_length=2, choices=TalkActivityType.choices, default=TalkActivityType.PRESENTATION)
     mode = models.CharField(max_length=2, choices=TalkModeType.choices, default=TalkModeType.IN_PERSON)
-    sponsor = models.ForeignKey(Sponsor, on_delete=models.SET_NULL, null=True, blank=True, related_name='talks')
+    sponsor = models.ForeignKey(Sponsor, on_delete=models.SET_NULL, default=None, null=True, blank=True, related_name='talks')
 
     def __str__(self) -> str:
         return f"Talk: '{self.title}'"

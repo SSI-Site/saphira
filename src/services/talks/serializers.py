@@ -23,4 +23,5 @@ class TalkSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'description': {'required': False, 'allow_blank': True, 'help_text': 'Opcional'},
+            'sponsor_id': {'required': False, 'allow_blank': True, 'help_text': 'Opcional'},
         }
