@@ -146,6 +146,31 @@ class AdminRetrieveUpdateDestroyTalkView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Talk.objects.all()
     serializer_class = TalkSerializer
 
+    @extend_schema(tags=['Talks'], summary="Update talk")
+    def update(self, request, *args, **kwargs):
+        """Atualiza uma palestra
+
+        Todos os campos são opcionais:
+        - `title`: Título da palestra
+        - `description`: Descrição da palestra
+        - `start_time`: Horário de início da palestra
+        - `end_time`: Horário de fim da palestra
+        - `speakers`: Lista de IDs dos palestrantes
+        - `sponsor_id`: ID do patrocinador da palestra
+        """
+        # Force partial update to make all parameters optional
+        kwargs['partial'] = True
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            self.perform_update(serializer)
+            return Response(
+                {"message": "Palestra atualizada com sucesso.", "talk": serializer.data},
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @extend_schema(tags=['Talks'], summary="Delete talk")
     def delete(self, request, *args, **kwargs):
         """Remover palestra"""
