@@ -126,6 +126,7 @@ if ENV == 'PRODUCTION':
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
+        "https://ssi-atual.netlify.app",
     ]
 else:
     CSRF_TRUSTED_ORIGINS = [
@@ -135,6 +136,7 @@ else:
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
+        "https://ssi-atual.netlify.app",
     ]
 
 # Como os domínios são diferentes, é necessário permitir o envio de cookies
@@ -144,6 +146,7 @@ if ENV == 'PRODUCTION':
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
+        "https://ssi-atual.netlify.app",
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
@@ -153,6 +156,7 @@ else:
         "https://semanadesi.com",
         "https://saphira.semanadesi.com",
         "https://co-dashboard.semanadesi.com",
+        "https://ssi-atual.netlify.app",
     ]
 CORS_ALLOW_CREDENTIALS = True
 
