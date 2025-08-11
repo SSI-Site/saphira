@@ -50,4 +50,4 @@ class StudentGiftRelationTestCase(TestCase):
         update_gift_balance(gift)
 
         # Verifica se o balanço foi atualizado corretamente
-        self.assertEqual(gift.balance, 1)
+        self.assertEqual(gift.balance, gift.total_amount - 1)

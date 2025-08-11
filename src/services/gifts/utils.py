@@ -6,7 +6,7 @@ def update_gift_balance (gift):
     # Obtém o número de alunos que possuem esse Gift
     students_count = StudentGift.objects.filter(gift=gift).count()
     # Atualiza o saldo do Gift
-    gift.balance = students_count
+    gift.balance = gift.total_amount - students_count
     gift.save()
 
 def check_and_assign_gifts(student):
