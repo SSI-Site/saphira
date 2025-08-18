@@ -5,7 +5,7 @@ from . import views
 student_urls = [
     path('login', views.StudentLogin.as_view(), name='student-login'),
     path('<uuid:student_id>/gifts', views.ListRetrieveStudentGiftsView.as_view(), name='list-retrieve-student-gift'),
-    path('<uuid:student_id>', views.StudentRetrieveUpdateView.as_view(), name='student-retrieve-update'),
+    path('id/<uuid:student_id>', views.StudentRetrieveUpdateView.as_view(), name='student-retrieve-update'),
     path('<uuid:student_id>/presences', views.RetrieveStudentPresencesView.as_view(), name='retrieve-student-presences'),
 ]
 
