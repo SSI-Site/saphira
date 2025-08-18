@@ -5,7 +5,7 @@ from . import views
 student_urls = [
     path('login', views.StudentLogin.as_view(), name='student-login'),
     path('<uuid:student_id>/gifts', views.ListRetrieveStudentGiftsView.as_view(), name='list-retrieve-student-gift'),
-    path('id/<uuid:student_id>', views.StudentRetrieveUpdateView.as_view(), name='student-retrieve-update'),
+    path('<uuid:student_id>', views.StudentRetrieveUpdateView.as_view(), name='student-retrieve-update'),
     path('<uuid:student_id>/presences', views.RetrieveStudentPresencesView.as_view(), name='retrieve-student-presences'),
 ]
 
@@ -18,7 +18,7 @@ admin_students_urls = [
 admin_student_urls = [
     path('<student_document>', views.AdminRetrieveStudentInfoView.as_view(), name='admin-retrieve-student-info'),
     path('<uuid:student_id>/gifts', views.AdminListRetrieveStudentGiftsByStudentView.as_view(), name='admin-list-retrieve-student-gifts'),
-    path('<uuid:student_id>', views.AdminRetrieveStudentById.as_view(), name='admin-retrieve-student'),
+    path('<uuid:student_id>/profile', views.AdminRetrieveStudentById.as_view(), name='admin-retrieve-student'),
 ]
 
 urlpatterns = student_urls
