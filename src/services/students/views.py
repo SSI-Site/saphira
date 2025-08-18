@@ -303,3 +303,24 @@ class AdminListRetrieveStudentGiftsByStudentView(generics.ListAPIView):
         student_id = self.kwargs.get('student_id')
         queryset = StudentGift.objects.filter(student_id=student_id)
         return apply_student_gift_filters(self, queryset)
+
+@extend_schema(tags=["Students"], summary="Retrieve student")
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminRetrieveStudentById(generics.RetrieveAPIView):
+
+    def get(self, request, *args, **kwargs):
+        """Retorna um estudante com base no `id`"""
+        student_id = kwargs.get('student_id')
+
+        try:
+            student = Student.objects.get(id=student_id)
+        except Student.DoesNotExist:
+            return Response({'error': 'Student not found'}, status=404)
+
+        return Response({
+            'id': student.id,
+            'name': student.name,
+            'email': student.email,
+            'code': student.code,
+            'usp_number': student.usp_number
+        })
