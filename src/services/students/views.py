@@ -191,7 +191,7 @@ class ListRetrieveStudentGiftsView(generics.ListAPIView):
 
     def get_queryset(self):
         student = self.request.user
-        queryset = StudentGift.objects.filter(student=student)
+        queryset = StudentGift.objects.filter(student=student.id)
         return apply_student_gift_filters(self, queryset)
 
 ############################################################################################################
