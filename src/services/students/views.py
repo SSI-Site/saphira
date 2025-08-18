@@ -203,9 +203,12 @@ class AdminListStudentsView(generics.ListAPIView):
     """Lista todos os estudantes"""
     queryset = Student.objects.all()
 
-    def get(self, request, *args, **kwargs):
-        students = self.get_queryset().values('id', 'name', 'code')
-        return Response(list(students))
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset().values('id', 'email', 'name', 'code')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(page)
+        return Response(list(queryset))
 
 @extend_schema(tags=["Students"], summary="Retrieve student by name")
 @method_decorator(admin_auth_required, name='dispatch')
@@ -213,10 +216,13 @@ class AdminListStudentsByNameView(generics.ListAPIView):
     """Retorna todos os estudantes que contenham em seus nomes `name`."""
     queryset = Student.objects.all()
 
-    def get(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         name = self.kwargs.get('name')
-        students = Student.objects.filter(name__icontains=name).values('id', 'name', 'code', 'email')
-        return Response(list(students))
+        queryset = Student.objects.filter(name__icontains=name).values('id', 'name', 'code', 'email')
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            return self.get_paginated_response(page)
+        return Response(list(queryset))
 
 @extend_schema(tags=["Students"], summary="Retrieve student")
 @method_decorator(admin_auth_required, name='dispatch')
@@ -246,6 +252,7 @@ class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
 
         return Response({
             'id': student.id,
+            'email': student.email,
             'name': student.name,
             'code': student.code,
             'in_person_presences_count': in_person_presences_count,
