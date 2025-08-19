@@ -74,7 +74,7 @@ class AdminListCreateGiftsView(generics.ListCreateAPIView):
         - `total_amount`: qnt. comprada pela COSSI
 
         **Nota**:
-        - `balance` é computado automaticamente na criação de um gift e atualizado sempre que um brinde é retirado
+        - `balance`: quantidade de brindes que estão disponíveis (computado automaticamente)
         """
         serializer = GiftSerializer(data=request.data)
 

@@ -259,14 +259,12 @@ class StudentGiftAssignmentAPITestCase(TestCase):
             description="Gift 1",
             min_presence=1,
             total_amount=10,
-            balance=10
         )
         self.gift2 = Gift.objects.create(
             name="Camiseta",
             description="Gift 2",
             min_presence=2,
             total_amount=5,
-            balance=5
         )
         self.url = reverse('admin-list-create-presence')
 

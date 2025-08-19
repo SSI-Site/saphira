@@ -13,7 +13,6 @@ class GiftSerializer(serializers.ModelSerializer):
             description=validated_data.get('description', None),
             min_presence=validated_data.get('min_presence', 1),
             total_amount=validated_data.get('total_amount', 0),
-            balance=validated_data.get('total_amount', 0)  # Inicialmente, o saldo é igual ao total
         )
         return gift
 

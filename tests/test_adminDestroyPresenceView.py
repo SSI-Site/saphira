@@ -85,7 +85,6 @@ class AdminDestroyPresenceViewTestCase(TestCase):
             description='Descrição do gift',
             min_presence=1,
             total_amount=10,
-            balance=10
         )
 
         # Atribui o gift ao aluno
