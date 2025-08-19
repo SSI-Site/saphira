@@ -2,19 +2,13 @@ from services.presences.models import Presence
 from .models import Gift
 from ..students.models import Student, StudentGift
 
-def update_gift_balance (gift):
-    # Obtém o número de alunos que possuem esse Gift
-    students_count = StudentGift.objects.filter(gift=gift).count()
-    # Atualiza o saldo do Gift
-    gift.balance = gift.total_amount - students_count
-    gift.save()
 
 def check_and_assign_gifts(student):
     # Contar presenças do aluno
     presence_count = Presence.objects.filter(student=student).count()
 
     # Obter todos os gifts disponíveis
-    gifts = Gift.objects.filter(min_presence__lte=presence_count, balance__gt=0)
+    gifts = Gift.objects.filter(min_presence__lte=presence_count)
 
     # Atribuir gifts ao aluno
     for gift in gifts:
@@ -23,7 +17,6 @@ def check_and_assign_gifts(student):
             # Criar a relação StudentGift
             StudentGift.objects.create(student=student, gift=gift)
             # Atualizar o saldo do gift
-            update_gift_balance(gift)
             break  # Atribui apenas um gift por presença mínima atendida
 
 def check_and_remove_gifts(student: Student):
@@ -40,7 +33,6 @@ def check_and_remove_gifts(student: Student):
         if presence_count < gift.min_presence:
             student_gift.delete()
             # Atualiza o saldo do gift
-            update_gift_balance(gift)
 
 def check_and_remove_gifts_from_gift(gift: Gift):
     student_gifts = StudentGift.objects.filter(gift=gift)
@@ -55,4 +47,3 @@ def check_and_remove_gifts_from_gift(gift: Gift):
         if presence_count < gift.min_presence:
             student_gift.delete()
             # Atualiza o saldo
-            update_gift_balance(gift)

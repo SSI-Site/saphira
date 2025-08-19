@@ -15,7 +15,6 @@ class ListRetrieveGiftsViewTestCase(APITestCase):
             description="Camiseta exclusiva do evento",
             min_presence=1,
             total_amount=100,
-            balance=100
         )
         self.gift2 = Gift.objects.create(
             id=uuid.uuid4(),
@@ -23,7 +22,6 @@ class ListRetrieveGiftsViewTestCase(APITestCase):
             description="Caneca com o logo do evento",
             min_presence=2,
             total_amount=50,
-            balance=50
         )
         self.gift3 = Gift.objects.create(
             id=uuid.uuid4(),
@@ -31,7 +29,6 @@ class ListRetrieveGiftsViewTestCase(APITestCase):
             description="Boné estiloso do evento",
             min_presence=3,
             total_amount=30,
-            balance=30
         )
 
         self.url = reverse('list-retrieve-gifts')
