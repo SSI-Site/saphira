@@ -1,5 +1,6 @@
 import string
 import random
+from uuid import UUID
 
 from django.db import models
 from django.http import Http404, JsonResponse
@@ -303,6 +304,36 @@ class AdminListRetrieveStudentGiftsByStudentView(generics.ListAPIView):
         student_id = self.kwargs.get('student_id')
         queryset = StudentGift.objects.filter(student_id=student_id)
         return apply_student_gift_filters(self, queryset)
+
+@extend_schema(tags=["Students"], summary="Update student's gifts")
+@method_decorator(admin_auth_required, name='dispatch')
+class AdminUpdateStudentGiftView(generics.UpdateAPIView):
+    """
+    Atualiza o campo `received` dos brindes dos estudantes. Indicando que ele foi retirado, esse é o único campo permitido editar.
+    """
+    serializer_class = StudentGiftSerializer
+    queryset = StudentGift.objects.all()
+
+    @extend_schema(summary="Update student gift received status")
+    @method_decorator(admin_auth_required, name='update')
+    def update(self, request, *args, **kwargs):
+        gift_id = kwargs.get('pk')
+
+        print(gift_id)
+        try:
+            student_gift = StudentGift.objects.get(pk=gift_id)
+        except StudentGift.DoesNotExist:
+            return Response({'error': 'Student gift not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if 'received' not in request.data:
+            return Response({'error': 'Field "received" is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Only allow updating the received field
+        student_gift.received = bool(request.data.get('received'))
+        student_gift.save()
+
+        serializer = self.get_serializer(student_gift)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @extend_schema(tags=["Students"], summary="Retrieve student")
 @method_decorator(admin_auth_required, name='dispatch')
