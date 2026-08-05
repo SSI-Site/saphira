@@ -1,5 +1,7 @@
 
 from django.contrib.auth import authenticate, login, logout
+from django.http import JsonResponse
+from django.middleware.csrf import get_token
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -25,6 +27,18 @@ from drf_spectacular.utils import extend_schema
 def index(request):
     """Ponto de entrada para o Saphira. Seja bem-vindo. Se essa endpoint não estiver funcionando o Saphira está fora do ar."""
     return Response({"message": "Bem-vinde à API Saphira!"}, status=status.HTTP_200_OK)
+
+@extend_schema(
+    tags=['Public'],
+    summary="Adquirir token CSRF",
+    responses={200: {"type": "object", "properties": {"csrfToken": {"type": "string"}}}}
+)
+@api_view(['GET'])
+def csrf(request):
+    """Rota apenas para retornar o token CSRF para frontend de cross-site origin. Deve ser chamada antes de qualquer outra requisição do fronted."""
+    return JsonResponse({
+        "csrfToken": get_token(request)
+    })
 
 @extend_schema(
     tags=['Admin'],
