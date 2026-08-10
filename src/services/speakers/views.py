@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from .models import Speaker
 from .serializers import SpeakerSerializer
 from ..api.decorators import admin_auth_required
+from ..talks.models import Talk
+from ..talks.serializers import TalkSerializer
 
 ############################################################################################################
 #                                             PUBLIC VIEWS
@@ -34,6 +36,26 @@ class RetrieveSpeakersView(generics.ListAPIView):
     """Retorna uma lista de todos os palestrantes"""
     queryset = Speaker.objects.all()
     serializer_class = SpeakerSerializer
+
+@extend_schema(
+    tags=["Speakers"],
+    summary="Retrieve speaker schedule",
+    responses={200: TalkSerializer(many=True)}
+)
+class RetrieveSpeakerSchedule(generics.ListAPIView):
+    """Retorna o cronograma de um palestrante.
+
+    Lista todas as palestras ministradas pelo palestrante, ordenadas por `start_time` crescente.
+    """
+    serializer_class = TalkSerializer
+
+    def get_queryset(self):
+        speaker_id = self.kwargs.get('speakerId')
+
+        if not Speaker.objects.filter(id=speaker_id).exists():
+            raise Http404(f"Palestrante com id {speaker_id} não encontrado.")
+
+        return Talk.objects.filter(speakers__id=speaker_id).order_by('start_time')
 
 ############################################################################################################
 #                                               ADMIN VIEWS
