@@ -58,3 +58,47 @@ class AdminListStudentsViewTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_list_students_authenticated_as_common_user(self):
+        # Usuário logado, mas sem ser da CO-SSI
+        User.objects.create_user(
+            username='estudante',
+            email='estudante@test.com',
+            password='estudantepassword'
+        )
+        self.client.logout()
+        self.client.login(username='estudante', password='estudantepassword')
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.json()['detail'], 'Acesso exclusivo da CO-SSI.')
+
+    def test_list_students_without_students(self):
+        Student.objects.all().delete()
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
+
+    def test_list_students_returns_every_student(self):
+        Student.objects.create(
+            name='Aluno 03',
+            email='aluno03@usp.br',
+            usp_number='11223344',
+            code='A003'
+        )
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), Student.objects.count())
+
+    def test_list_students_returns_expected_fields(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        for student in response.data:
+            self.assertEqual(set(student.keys()), {'id', 'email', 'name', 'code'})
