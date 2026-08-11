@@ -32,16 +32,33 @@ class AdminListStudentsViewTestCase(TestCase):
 
         self.url = reverse('admin-list-students')
 
+    def create_students(self, quantity, first_index=3):
+        """Cria estudantes extras, nomeados na mesma sequência dos criados no setUp"""
+        return Student.objects.bulk_create([
+            Student(
+                name=f'Aluno {index:02d}',
+                email=f'aluno{index:02d}@usp.br',
+                usp_number=f'{index:08d}',
+                code=f'B{index:03d}'
+            )
+            for index in range(first_index, first_index + quantity)
+        ])
+
     def test_list_students_authenticated(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data['count'], 2)
+        self.assertIsNone(response.data['next'])
+        self.assertIsNone(response.data['previous'])
 
-        returned_ids = [str(student['id']) for student in response.data]
-        returned_names = [student['name'] for student in response.data]
-        returned_codes = [student['code'] for student in response.data]
+        students = response.data['results']
+        self.assertEqual(len(students), 2)
+
+        returned_ids = [str(student['id']) for student in students]
+        returned_names = [student['name'] for student in students]
+        returned_codes = [student['code'] for student in students]
 
         self.assertIn(str(self.student1.id), returned_ids)
         self.assertIn(str(self.student2.id), returned_ids)
@@ -58,3 +75,71 @@ class AdminListStudentsViewTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_list_students_with_size(self):
+        self.create_students(3)  # 5 estudantes no total
+
+        response = self.client.get(self.url, {'size': 2})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 5)
+        self.assertEqual(len(response.data['results']), 2)
+        self.assertIsNotNone(response.data['next'])
+        self.assertIsNone(response.data['previous'])
+
+        # A lista é ordenada por nome, então a primeira página traz os dois primeiros alunos
+        self.assertEqual(
+            [student['name'] for student in response.data['results']],
+            ['Aluno 01', 'Aluno 02']
+        )
+
+    def test_list_students_with_page(self):
+        self.create_students(3)  # 5 estudantes no total
+
+        first_page = self.client.get(self.url, {'size': 2, 'page': 1})
+        second_page = self.client.get(self.url, {'size': 2, 'page': 2})
+
+        self.assertEqual(second_page.status_code, status.HTTP_200_OK)
+        self.assertEqual(second_page.data['count'], 5)
+        self.assertEqual(len(second_page.data['results']), 2)
+        self.assertIsNotNone(second_page.data['previous'])
+
+        self.assertEqual(
+            [student['name'] for student in second_page.data['results']],
+            ['Aluno 03', 'Aluno 04']
+        )
+
+        # Páginas diferentes não repetem estudantes
+        first_page_ids = {student['id'] for student in first_page.data['results']}
+        second_page_ids = {student['id'] for student in second_page.data['results']}
+        self.assertFalse(first_page_ids & second_page_ids)
+
+    def test_list_students_last_page(self):
+        self.create_students(3)  # 5 estudantes no total
+
+        response = self.client.get(self.url, {'size': 2, 'page': 3})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertIsNone(response.data['next'])
+
+    def test_list_students_page_out_of_range(self):
+        response = self.client.get(self.url, {'size': 2, 'page': 99})
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_list_students_default_page_size(self):
+        self.create_students(30)  # 32 estudantes no total
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.data['count'], 32)
+        self.assertEqual(len(response.data['results']), 20)
+
+    def test_list_students_size_is_limited_to_max_page_size(self):
+        self.create_students(120)  # 122 estudantes no total
+
+        response = self.client.get(self.url, {'size': 500})
+
+        self.assertEqual(response.data['count'], 122)
+        self.assertEqual(len(response.data['results']), 100)

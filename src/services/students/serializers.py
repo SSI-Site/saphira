@@ -9,7 +9,8 @@ class StudentLoginSerializer(serializers.Serializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ['id', 'name', 'email', 'usp_number']
+        fields = ['id', 'name', 'email', 'code', 'usp_number']
+        read_only_fields = ['code']  # gerado pelo sistema, nunca enviado pelo cliente
 
 class StudentGiftSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)
