@@ -97,7 +97,7 @@ class AdminListStudentsViewTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, [])
+        self.assertEqual(response.data['results'], [])
 
     def test_list_students_returns_every_student(self):
         Student.objects.create(
@@ -110,15 +110,16 @@ class AdminListStudentsViewTestCase(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), Student.objects.count())
+        self.assertEqual(response.data['count'], Student.objects.count())
 
     def test_list_students_returns_expected_fields(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        for student in response.data:
-            self.assertEqual(set(student.keys()), {'id', 'email', 'name', 'code'})
+        for student in response.data['results']:
+            self.assertEqual(set(student.keys()), {'id', 'email', 'name', 'code', 'usp_number'})
+
     def test_list_students_with_size(self):
         self.create_students(3)  # 5 estudantes no total
 
