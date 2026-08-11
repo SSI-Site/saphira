@@ -16,6 +16,7 @@ from services.api.decorators import admin_auth_required, firebase_auth_required,
 from services.presences.models import Presence
 from .serializers import StudentSerializer, StudentGiftSerializer
 from .models import Student, StudentGift
+from .pagination import StudentPagination
 from .utils import apply_student_gift_filters
 
 
@@ -201,15 +202,18 @@ class ListRetrieveStudentGiftsView(generics.ListAPIView):
 @extend_schema(tags=["Students"], summary="List students")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListStudentsView(generics.ListAPIView):
-    """Lista todos os estudantes"""
-    queryset = Student.objects.all()
+    """Lista todos os estudantes.
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset().values('id', 'email', 'name', 'code')
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            return self.get_paginated_response(page)
-        return Response(list(queryset))
+    A resposta é paginada e você pode controlá-la usando os seguintes parâmetros na URL:
+    - `page`: página desejada, começando em 1. Ex: /admin/students/?page=2
+    - `size`: quantidade de estudantes por página, no máximo 100. Ex: /admin/students/?size=50
+
+    O retorno segue o formato `{count, next, previous, results}`, onde `results` é a lista
+    de estudantes da página atual.
+    """
+    queryset = Student.objects.all().order_by('name', 'id')
+    serializer_class = StudentSerializer
+    pagination_class = StudentPagination
 
 @extend_schema(tags=["Students"], summary="Retrieve student by name")
 @method_decorator(admin_auth_required, name='dispatch')
