@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 import uuid
 
@@ -10,6 +12,8 @@ class Student(models.Model):
     email = models.EmailField(max_length=128, unique=True)
     usp_number = models.CharField(max_length=8, unique=True, null=True, blank=True)
     code = models.CharField(max_length=4, unique=True, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return f"Student: {self.name}"

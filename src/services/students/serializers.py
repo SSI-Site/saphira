@@ -1,15 +1,49 @@
 from rest_framework import serializers
-from .models import Student, StudentGift
+
 from ..gifts.serializers import GiftPublicSerializer
+from .models import Student, StudentGift
+
 
 class StudentLoginSerializer(serializers.Serializer):
     name = serializers.CharField()
     email = serializers.EmailField()
 
+
+class StudentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model: type[Student] = Student
+        fields: list[str] = [
+            "id",
+            "name",
+            "email",
+            "code",
+            "created_at",
+            "updated_at",
+        ]
+
+
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Student
-        fields = ['id', 'name', 'email', 'usp_number']
+        model: type[Student] = Student
+        fields: list[str] = [
+            "id",
+            "name",
+            "email",
+            "usp_number",
+            "code",
+            "created_at",
+            "updated_at",
+        ]
+
+        read_only_fields: list[str] = [
+            "id",
+            "name",
+            "email",
+            "code",
+            "created_at",
+            "updated_at",
+        ]
+
 
 class StudentGiftSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)

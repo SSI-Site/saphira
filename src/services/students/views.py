@@ -1,5 +1,5 @@
-import string
 import random
+import string
 from uuid import UUID
 
 from django.db import models
@@ -12,12 +12,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from services.api.decorators import admin_auth_required, firebase_auth_required, student_auth_required
+from services.api.decorators import (
+    admin_auth_required,
+    firebase_auth_required,
+    student_auth_required,
+)
 from services.presences.models import Presence
-from .serializers import StudentSerializer, StudentGiftSerializer
-from .models import Student, StudentGift
-from .utils import apply_student_gift_filters
 
+from .models import Student, StudentGift
+from .serializers import (
+    StudentGiftSerializer,
+    StudentListSerializer,
+    StudentSerializer,
+)
+from .utils import apply_student_gift_filters, generate_unique_code
 
 # Create your views here.
 
@@ -88,6 +96,8 @@ class StudentLogin(APIView):
             'email': new_student.email,
             'code': new_student.code,
             'usp_number': new_student.usp_number,
+            'created_at': new_student.created_at,
+            'updated_at': new_student.updated_at,
             'access': str(access_token),
             'refresh': str(refresh),
         }, status=status.HTTP_201_CREATED)
@@ -106,60 +116,17 @@ def student_index(request):
     """Ponto de entrada para a área de estudantes"""
     return Response({"message": "Bem-vinde à área exclusiva de estudantes!"}, status=200)
 
-@extend_schema(
-    tags=["Students"],
-    summary="Retrieve student"
-)
-@method_decorator(student_auth_required, name='dispatch')
+
+@extend_schema(tags=["Students"], summary="Retrieve student")
+@method_decorator(student_auth_required, name="dispatch")
 class StudentRetrieveUpdateView(generics.RetrieveUpdateAPIView):
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
 
-    def get(self, request, *args, **kwargs):
-        """Retorna um estudante com base no `id`"""
-        student_id = kwargs.get('student_id')
+    # Pega student_id da url e verifica contra id no banco
+    lookup_url_kwarg = "student_id"
+    lookup_field = "id"
 
-        try:
-            student = Student.objects.get(id=student_id)
-        except Student.DoesNotExist:
-            return Response({'error': 'Student not found'}, status=404)
-
-        return Response({
-            'id': student.id,
-            'name': student.name,
-            'email': student.email,
-            'code': student.code,
-            'usp_number': student.usp_number,
-        })
-
-    @extend_schema(summary="Update student")
-    def put(self, request, *args, **kwargs):
-        """Atualiza o estudante.
-
-        É possível atualizar os seguintes campos: `usp_number`
-        """
-        student_id = kwargs.get('student_id')
-
-        try:
-            student = Student.objects.get(id=student_id)
-        except Student.DoesNotExist:
-            return Response({'error': 'Student not found'}, status=404)
-
-        allowed_fields = ['usp_number']
-
-        for field in allowed_fields:
-            if field in request.data:
-                setattr(student, field, request.data[field])
-
-        student.save()
-
-        return Response({
-            'id': student.id,
-            'name': student.name,
-            'email': student.email,
-            'code': student.code,
-            'usp_number': student.usp_number,
-        })
 
 @extend_schema(tags=["Students"], summary="Retrieve student's presences")
 @method_decorator(student_auth_required, name='dispatch')
@@ -199,31 +166,25 @@ class ListRetrieveStudentGiftsView(generics.ListAPIView):
 #                                               ADMIN VIEWS
 ############################################################################################################
 @extend_schema(tags=["Students"], summary="List students")
-@method_decorator(admin_auth_required, name='dispatch')
+@method_decorator(admin_auth_required, name="dispatch")
 class AdminListStudentsView(generics.ListAPIView):
     """Lista todos os estudantes"""
-    queryset = Student.objects.all()
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset().values('id', 'email', 'name', 'code')
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            return self.get_paginated_response(page)
-        return Response(list(queryset))
+    queryset = Student.objects.all()
+    serializer_class = StudentListSerializer
+
 
 @extend_schema(tags=["Students"], summary="Retrieve student by name")
-@method_decorator(admin_auth_required, name='dispatch')
+@method_decorator(admin_auth_required, name="dispatch")
 class AdminListStudentsByNameView(generics.ListAPIView):
     """Retorna todos os estudantes que contenham em seus nomes `name`."""
-    queryset = Student.objects.all()
 
-    def list(self, request, *args, **kwargs):
-        name = self.kwargs.get('name')
-        queryset = Student.objects.filter(name__icontains=name).values('id', 'name', 'code', 'email')
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            return self.get_paginated_response(page)
-        return Response(list(queryset))
+    serializer_class = StudentListSerializer
+
+    def get_queryset(self):
+        name = self.kwargs.get("name")
+        return Student.objects.filter(name__icontains=name)
+
 
 @extend_schema(tags=["Students"], summary="Retrieve student")
 @method_decorator(admin_auth_required, name='dispatch')
@@ -251,15 +212,20 @@ class AdminRetrieveStudentInfoView(generics.RetrieveAPIView):
             .values('talk_title')
         )
 
-        return Response({
-            'id': student.id,
-            'email': student.email,
-            'name': student.name,
-            'code': student.code,
-            'in_person_presences_count': in_person_presences_count,
-            'total_presences_count': total_presences_count,
-            'presences': list(presences_with_talk_title)
-        })
+        return Response(
+            {
+                "id": student.id,
+                "email": student.email,
+                "name": student.name,
+                "code": student.code,
+                "created_at": student.created_at,
+                "updated_at": student.updated_at,
+                "in_person_presences_count": in_person_presences_count,
+                "total_presences_count": total_presences_count,
+                "presences": list(presences_with_talk_title),
+            }
+        )
+
 
 @extend_schema(tags=["Students"], summary="Delete student")
 @method_decorator(admin_auth_required, name='delete')
@@ -335,23 +301,14 @@ class AdminUpdateStudentGiftView(generics.UpdateAPIView):
         serializer = self.get_serializer(student_gift)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @extend_schema(tags=["Students"], summary="Retrieve student")
-@method_decorator(admin_auth_required, name='dispatch')
+@method_decorator(admin_auth_required, name="dispatch")
 class AdminRetrieveStudentById(generics.RetrieveAPIView):
+    """Retorna um estudante pelo seu id."""
 
-    def get(self, request, *args, **kwargs):
-        """Retorna um estudante com base no `id`"""
-        student_id = kwargs.get('student_id')
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
-        try:
-            student = Student.objects.get(id=student_id)
-        except Student.DoesNotExist:
-            return Response({'error': 'Student not found'}, status=404)
-
-        return Response({
-            'id': student.id,
-            'name': student.name,
-            'email': student.email,
-            'code': student.code,
-            'usp_number': student.usp_number
-        })
+    lookup_url_kwarg = "student_id"
+    lookup_field = "id"
