@@ -101,20 +101,35 @@ class AdminListCreateWinnerTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
-        draw_winner1 = {
+        expected_winner1 = {
             "id": draw_winner1.id,
-            "student": draw_winner1.student.id,
-            "talk": draw_winner1.talk.id,
+            "code": student1.code,
+            "name": student1.name,
+            "email": student1.email,
+            "talkTitle": self.talk.title,
         }
 
-        draw_winner2 = {
+        expected_winner2 = {
             "id": draw_winner2.id,
-            "student": draw_winner2.student.id,
-            "talk": draw_winner2.talk.id,
+            "code": student2.code,
+            "name": student2.name,
+            "email": student2.email,
+            "talkTitle": self.talk.title,
         }
 
-        self.assertDictEqual(draw_winner1, response.data[0])
-        self.assertDictEqual(draw_winner2, response.data[1])
+        self.assertCountEqual([expected_winner1, expected_winner2], response.data)
+
+        for winner in response.data:
+            # O front recebe os dados do estudante e da palestra, não os ids das relações
+            self.assertEqual(set(winner.keys()), {"id", "code", "name", "email", "talkTitle"})
+            self.assertNotIn("student", winner)
+            self.assertNotIn("talk", winner)
+
+    def test_list_draw_winners_without_winners(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
 
     def test_create_draw_winner(self):
         student = Student.objects.create(

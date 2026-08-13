@@ -75,18 +75,27 @@ class AdminRetrieveWinnerByTalkViewTestCase(APITestCase):
 
         expected_winner1 = {
             "id": draw_winner1.id,
-            "student": student1.id,
-            "talk": self.talk.id,
+            "code": student1.code,
+            "name": student1.name,
+            "email": student1.email,
+            "talkTitle": self.talk.title,
         }
 
         expected_winner2 = {
             "id": draw_winner2.id,
-            "student": student2.id,
-            "talk": self.talk.id,
+            "code": student2.code,
+            "name": student2.name,
+            "email": student2.email,
+            "talkTitle": self.talk.title,
         }
 
-        self.assertDictEqual(expected_winner1, response.data[0])
-        self.assertDictEqual(expected_winner2, response.data[1])
+        self.assertCountEqual([expected_winner1, expected_winner2], response.data)
+
+        for winner in response.data:
+            # O front recebe os dados do estudante e da palestra, não os ids das relações
+            self.assertEqual(set(winner.keys()), {"id", "code", "name", "email", "talkTitle"})
+            self.assertNotIn("student", winner)
+            self.assertNotIn("talk", winner)
 
     def test_retrieve_draw_winners_by_talk_not_found(self):
         fake_id = 404
