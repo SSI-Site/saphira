@@ -6,6 +6,7 @@ speakers_urls = [
 ]
 
 speaker_urls = [
+    path('<uuid:speakerId>/schedule', RetrieveSpeakerSchedule.as_view(), name='retrieve-speaker-schedule'),
     path('<str:name>', RetrieveSpeakerByNameView.as_view(), name='retrieve-speaker-by-name'),
 ]
 

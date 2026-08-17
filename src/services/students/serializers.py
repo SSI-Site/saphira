@@ -24,26 +24,9 @@ class StudentListSerializer(serializers.ModelSerializer):
 
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
-        model: type[Student] = Student
-        fields: list[str] = [
-            "id",
-            "name",
-            "email",
-            "usp_number",
-            "code",
-            "created_at",
-            "updated_at",
-        ]
-
-        read_only_fields: list[str] = [
-            "id",
-            "name",
-            "email",
-            "code",
-            "created_at",
-            "updated_at",
-        ]
-
+        model = Student
+        fields = ['id', 'name', 'email', 'code', 'usp_number', 'created_at', 'updated_at']
+        read_only_fields = ['code', 'created_at', 'updated_at']  # gerado pelo sistema, nunca enviado pelo cliente
 
 class StudentGiftSerializer(serializers.ModelSerializer):
     student = StudentSerializer(read_only=True)

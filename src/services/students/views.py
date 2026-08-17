@@ -18,6 +18,7 @@ from services.api.decorators import (
     student_auth_required,
 )
 from services.presences.models import Presence
+from .pagination import StudentPagination
 
 from .models import Student, StudentGift
 from .serializers import (
@@ -168,11 +169,18 @@ class ListRetrieveStudentGiftsView(generics.ListAPIView):
 @extend_schema(tags=["Students"], summary="List students")
 @method_decorator(admin_auth_required, name="dispatch")
 class AdminListStudentsView(generics.ListAPIView):
-    """Lista todos os estudantes"""
+    """Lista todos os estudantes.
 
-    queryset = Student.objects.all()
-    serializer_class = StudentListSerializer
+    A resposta é paginada e você pode controlá-la usando os seguintes parâmetros na URL:
+    - `page`: página desejada, começando em 1. Ex: /admin/students/?page=2
+    - `size`: quantidade de estudantes por página, no máximo 100. Ex: /admin/students/?size=50
 
+    O retorno segue o formato `{count, next, previous, results}`, onde `results` é a lista
+    de estudantes da página atual.
+    """
+    queryset = Student.objects.all().order_by('name', 'id')
+    serializer_class = StudentSerializer
+    pagination_class = StudentPagination
 
 @extend_schema(tags=["Students"], summary="Retrieve student by name")
 @method_decorator(admin_auth_required, name="dispatch")
