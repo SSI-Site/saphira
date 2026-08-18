@@ -118,7 +118,7 @@ class AdminListStudentsViewTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         for student in response.data['results']:
-            self.assertEqual(set(student.keys()), {'id', 'email', 'name', 'code', 'usp_number'})
+            self.assertEqual(set(student.keys()), {'id', 'email', 'name', 'code', 'usp_number', 'created_at', 'updated_at'})
 
     def test_list_students_with_size(self):
         self.create_students(3)  # 5 estudantes no total

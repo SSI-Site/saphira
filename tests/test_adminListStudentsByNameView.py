@@ -98,7 +98,7 @@ class AdminListStudentsByNameViewTestCase(TestCase):
         self.assertEqual(len(response.data), 1)
 
         student = response.data[0]
-        self.assertEqual(set(student.keys()), {'id', 'name', 'code', 'email'})
+        self.assertEqual(set(student.keys()), {'id', 'name', 'code', 'email', 'created_at', 'updated_at'})
 
         self.assertEqual(str(student['id']), str(self.bruno.id))
         self.assertEqual(student['name'], self.bruno.name)
