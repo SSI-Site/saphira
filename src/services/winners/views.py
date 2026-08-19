@@ -13,6 +13,16 @@ from services.winners.serializers import DrawWinnerSerializer
 
 # Create your views here.
 
+def draw_winners_queryset():
+    """Queryset base dos sorteados.
+
+    O `DrawWinnerSerializer` lê o estudante, a palestra, seus palestrantes e o patrocinador,
+    então já trazemos tudo junto para não fazer uma consulta por sorteado.
+    """
+    return DrawWinner.objects.select_related(
+        'student', 'talk', 'talk__sponsor'
+    ).prefetch_related('talk__speakers')
+
 @extend_schema(tags=['Winners'], summary="Draw a student from talk")
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminDrawOnTalkView(generics.RetrieveAPIView):
@@ -46,13 +56,14 @@ class AdminDrawOnTalkView(generics.RetrieveAPIView):
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListWinnerView(generics.ListAPIView):
     """Lista todos os vencedores/sorteados
+
+    Cada sorteado é retornado com os dados do estudante (`code`, `name`, `email`)
+    e o título da palestra (`talkTitle`).
     """
-    queryset = DrawWinner.objects.all()
+    serializer_class = DrawWinnerSerializer
 
-    def get(self, request, *args, **kwargs):
-        draw_winners = self.get_queryset().values('id', 'student', 'talk')
-
-        return Response(list(draw_winners))
+    def get_queryset(self):
+        return draw_winners_queryset()
 
 @extend_schema(tags=["Winners"], summary="Delete winner")
 @method_decorator(admin_auth_required, name='dispatch')
@@ -83,7 +94,9 @@ class AdminDestroyWinnerView(generics.DestroyAPIView):
 @method_decorator(admin_auth_required, name='dispatch')
 class AdminListCreateWinner(generics.ListCreateAPIView):
     serializer_class = DrawWinnerSerializer
-    queryset = DrawWinner.objects.all()
+
+    def get_queryset(self):
+        return draw_winners_queryset()
 
     def get(self, request, *args, **kwargs):
         talk_id = self.kwargs.get('talk_id')
@@ -92,8 +105,8 @@ class AdminListCreateWinner(generics.ListCreateAPIView):
         if not talk:
             return Response({'error': f"Palestra com id {talk_id} não encontrada."}, status=status.HTTP_400_BAD_REQUEST)
 
-        draw_winners = DrawWinner.objects.filter(talk=talk_id).values('id', 'talk', 'student')
-        return Response(list(draw_winners))
+        draw_winners = self.get_queryset().filter(talk=talk_id)
+        return Response(self.get_serializer(draw_winners, many=True).data)
 
     @extend_schema(tags=["Winners"], summary="Create winners")
     def post(self, request, *args, **kwargs):
@@ -132,16 +145,16 @@ class AdminRetrieveWinnerByStudentView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'student_id'
 
     def get_queryset(self):
-        return DrawWinner.objects.all()
+        return draw_winners_queryset()
 
     def get(self, request, *args, **kwargs):
         student_id = self.kwargs.get(self.lookup_url_kwarg)
-        draw_winners = self.get_queryset().filter(student_id=student_id).values('id', 'talk', 'student')
+        draw_winners = self.get_queryset().filter(student_id=student_id)
 
         if not draw_winners:
             return Response({'error': f"Não há brindes registrados para alune de id {student_id}."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(list(draw_winners))
+        return Response(self.get_serializer(draw_winners, many=True).data)
 
 @extend_schema(tags=["Winners"], summary="List winners by talk")
 @method_decorator(admin_auth_required, name='dispatch')
@@ -150,13 +163,13 @@ class AdminRetrieveWinnerByTalkView(generics.RetrieveAPIView):
     lookup_url_kwarg = 'talk_id'
 
     def get_queryset(self):
-        return DrawWinner.objects.all()
+        return draw_winners_queryset()
 
     def get(self, request, *args, **kwargs):
         talk_id = self.kwargs.get(self.lookup_url_kwarg)
-        draw_winners = self.get_queryset().filter(talk_id=talk_id).values('id', 'student', 'talk')
+        draw_winners = self.get_queryset().filter(talk_id=talk_id)
 
         if not draw_winners:
             return Response({'error': f"Não há sorteados registrados para palestra de id {talk_id}."}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response(list(draw_winners))
+        return Response(self.get_serializer(draw_winners, many=True).data)

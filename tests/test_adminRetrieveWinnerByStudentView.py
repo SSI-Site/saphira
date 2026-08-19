@@ -85,20 +85,29 @@ class AdminRetrieveWinnerByStudentViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
-        draw_winner1 = {
+        expected_winner1 = {
             "id": draw_winner1.id,
-            "student": self.student.id,
-            "talk": talk1.id,
+            "code": self.student.code,
+            "name": self.student.name,
+            "email": self.student.email,
+            "talkTitle": talk1.title,
         }
 
-        draw_winner2 = {
+        expected_winner2 = {
             "id": draw_winner2.id,
-            "student": self.student.id,
-            "talk": talk2.id,
+            "code": self.student.code,
+            "name": self.student.name,
+            "email": self.student.email,
+            "talkTitle": talk2.title,
         }
 
-        self.assertDictEqual(draw_winner1, response.data[0])
-        self.assertDictEqual(draw_winner2, response.data[1])
+        self.assertCountEqual([expected_winner1, expected_winner2], response.data)
+
+        for winner in response.data:
+            # O front recebe os dados do estudante e da palestra, não os ids das relações
+            self.assertEqual(set(winner.keys()), {"id", "code", "name", "email", "talkTitle"})
+            self.assertNotIn("student", winner)
+            self.assertNotIn("talk", winner)
 
     def test_retrieve_draw_winners_by_student_invalid_id(self):
         fake_id = uuid.uuid4()

@@ -74,13 +74,26 @@ class AdminListRetrieveWinnerViewTestCase(TestCase):
 
         self.url = reverse('admin-list-draw-winners')
 
-    def test_list_draw_winner_authenticated(self):
+    def login_as_admin(self):
         User.objects.create_superuser(
             username='adminSSI',
             email='admin@test.com',
             password='adminSSIpassword'
         )
         self.client.login(username='adminSSI', password='adminSSIpassword')
+
+    def expected_winner(self, draw_winner):
+        """Monta o sorteado no formato esperado pelo front-end"""
+        return {
+            'id': draw_winner.id,
+            'code': draw_winner.student.code,
+            'name': draw_winner.student.name,
+            'email': draw_winner.student.email,
+            'talkTitle': draw_winner.talk.title,
+        }
+
+    def test_list_draw_winner_authenticated(self):
+        self.login_as_admin()
 
         response = self.client.get(self.url)
         # Limpa a sessão
@@ -90,19 +103,34 @@ class AdminListRetrieveWinnerViewTestCase(TestCase):
 
         self.assertEqual(len(response.data), 2)
 
-        draw_winner1 = {
-            'id': self.draw_winner1.id,
-            'talk': self.draw_winner1.talk.id,
-            'student': self.draw_winner1.student.id
-        }
-        draw_winner2 = {
-            'id': self.draw_winner2.id,
-            'talk': self.draw_winner2.talk.id,
-            'student': self.draw_winner2.student.id
-        }
+        self.assertCountEqual(
+            [self.expected_winner(self.draw_winner1), self.expected_winner(self.draw_winner2)],
+            response.data
+        )
 
-        self.assertDictEqual(draw_winner1, response.data[0])
-        self.assertDictEqual(draw_winner2, response.data[1])
+    def test_list_draw_winner_returns_student_and_talk_data(self):
+        self.login_as_admin()
+
+        response = self.client.get(self.url)
+        self.client.logout()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        for winner in response.data:
+            # O front recebe os dados do estudante e da palestra, não os ids das relações
+            self.assertEqual(set(winner.keys()), {'id', 'code', 'name', 'email', 'talkTitle'})
+            self.assertNotIn('student', winner)
+            self.assertNotIn('talk', winner)
+
+    def test_list_draw_winner_without_winners(self):
+        DrawWinner.objects.all().delete()
+        self.login_as_admin()
+
+        response = self.client.get(self.url)
+        self.client.logout()
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, [])
 
     def test_list_draw_winner_unauthenticated(self):
         # Assegura que não há login
